@@ -1,0 +1,25 @@
+{
+  "name": "@mzgoddard/jest-webpack",
+  "version": "1.0.0",
+  "description": "Use webpack loader and plugins you want to build modules into individual files and test them with jest.",
+  "main": "jest-webpack.js",
+  "scripts": {
+    "test": "webpack"
+  },
+  "keywords": [],
+  "author": "Michael \"Z\" Goddard <mzgoddard@gmail.com>",
+  "license": "ISC",
+  "devDependencies": {
+    "babel": "^6.23.0",
+    "babel-core": "^6.24.1",
+    "babel-loader": "^7.0.0",
+    "babel-preset-env": "^1.5.1",
+    "babel-preset-jest": "^20.0.3",
+    "hard-source-webpack-plugin": "^0.3.12",
+    "jest": "^20.0.4",
+    "webpack": "^2.6.1"
+  },
+  "dependencies": {
+    "glob": "^7.1.2"
+  }
+}

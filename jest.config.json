@@ -1,0 +1,7 @@
+{
+  "transform": {
+    ".*": "../../../src/webpack-preprocessor.js"
+  },
+  "testPathIgnorePatterns": [],
+  "transformIgnorePatterns": []
+}
