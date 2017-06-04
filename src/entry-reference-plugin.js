@@ -20,6 +20,13 @@ class EntryReferencePlugin {
       compilation.dependencyFactories.set(EntryReferenceDependency, normalModuleFactory);
       compilation.dependencyFactories.set(EntryReferenceTransformDependency, normalModuleFactory);
 
+      normalModuleFactory.plugin('before-resolve', (data, callback) => {
+        if (typeof data.request === 'object') {
+          data.request = data.request.rawRequest;
+        }
+        callback(null, data);
+      });
+
       const referenceModules = {};
       normalModuleFactory.plugin('resolver', resolver => (result, callback) => {
         const dependency = result.dependencies[0];
@@ -29,10 +36,10 @@ class EntryReferencePlugin {
         //   return resolver(data, callback);
         // }
         if (dependency instanceof EntryReferenceTransformDependency) {
-          return callback(null, dependency.data);
+          return callback(null, dependency.request);
         }
         else if (dependency instanceof EntryReferenceDependency) {
-          return callback(null, referenceModules[dependency.data.resource]);
+          return callback(null, referenceModules[dependency.request.resource]);
         }
 
         resolver(result, (err, data) => {
@@ -61,7 +68,6 @@ class EntryReferencePlugin {
             });
           }
           else {
-            console.log(data.request);
             const dep = new EntryReferenceTransformDependency(data);
             referenceModules[data.resource].addData(dep);
             // if (referenceModules[data.resource].built) {

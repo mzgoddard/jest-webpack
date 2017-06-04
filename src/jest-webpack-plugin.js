@@ -16,7 +16,8 @@ class JestWebpackPlugin {
   // externals: Treat dependencies that match any test in this option as
   // external to the chunk being built. Being external they need to be a script
   // as their own chunk or not need webpack to handle them.
-  externals(context, request, cb) {
+  externals(context, depRequest, cb) {
+    const request = typeof depRequest === 'string' ? depRequest : depRequest.rawRequest;
     const requestParts = request.split('!');
     const resource = requestParts[requestParts.length - 1];
 

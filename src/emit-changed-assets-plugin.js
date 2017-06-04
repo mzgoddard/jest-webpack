@@ -7,6 +7,8 @@ const hash = require('./hash');
 
 class EmitChangedAssetsPlugin {
   apply(compiler) {
+    const config = compiler.options;
+
     // Create assets for original source files that changed.
     compiler.plugin('emit', function(compilation, cb) {
       // console.log('emit');
@@ -29,7 +31,6 @@ class EmitChangedAssetsPlugin {
       });
 
       Object.entries(originals).forEach(([name, original]) => {
-        console.log('original', name);
         const assetPath = join('original', name);
         compilation.assets[assetPath] = new RawSource(readFileSync(original));
       });
@@ -48,7 +49,9 @@ class EmitChangedAssetsPlugin {
             delete compilation.assets[key];
           }
         }
-        catch (_) {}
+        catch (err) {
+          console.error(err);
+        }
       });
       cb();
     });

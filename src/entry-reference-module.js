@@ -37,13 +37,12 @@ class EntryReferenceModule extends Module {
 
     const references = [];
     this.dependencies.forEach(dep => {
-      console.log(dep.data.resource, !!dep.module);
       if (!dep.module) {return;}
-      if (dep.data.request.indexOf('!') === -1) {
+      if (dep.request.request.indexOf('!') === -1) {
         references.push(`  default: __webpack_require__(${dep.module.id})`);
       }
       else {
-        references.push(`  ${JSON.stringify(hash(dep.data.request))}: __webpack_require__(${dep.module.id})`);
+        references.push(`  ${JSON.stringify(hash(dep.request.request))}: __webpack_require__(${dep.module.id})`);
       }
     });
     this._source = new RawSource(`module.exports = {\n${references.join(',\n')}\n};`);

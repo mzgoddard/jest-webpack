@@ -18,7 +18,6 @@ class EntryPerModulePlugin {
       const context = compiler.options.context;
       const modules = {};
       compilation.plugin('build-module', module => {
-        console.log(module.identifier());
         if (!module.external) {return;}
         if (!this.entries[module.request]) {return;}
 
