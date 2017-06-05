@@ -56,7 +56,7 @@ class JestWebpackPlugin {
     compiler.options.output.filename = 'webpack/[name]';
     compiler.options.output.libraryTarget = 'commonjs2';
     compiler.options.target = 'node';
-    compiler.options.externals = this.externals.bind(this);
+    // compiler.options.externals = this.externals.bind(this);
 
     new EmitChangedAssetsPlugin().apply(compiler);
     new EntryReferencePlugin().apply(compiler);

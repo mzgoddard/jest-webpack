@@ -1,6 +1,7 @@
 const {dirname, relative} = require('path');
 
 const SingleEntryDependency = require('webpack/lib/dependencies/SingleEntryDependency');
+const ExternalModule = require('webpack/lib/ExternalModule');
 
 const EntryReferenceTransformDependency = require('./entry-reference-transform-dependency');
 const EntryReferenceModule = require('./entry-reference-module');
@@ -50,9 +51,9 @@ class EntryReferencePlugin {
             return callback(err, data);
           }
 
-          if (exclude(data.resource)) {
-            return callback(err, data);
-            // return callback(err, new ExternalModule(data.request, 'commonjs2'));
+          if (data.loaders.length === 0 && exclude(data.resource)) {
+            // return callback(err, data);
+            return callback(err, new ExternalModule(data.request, 'commonjs2'));
           }
 
           if (dependency instanceof SingleEntryDependency) {
