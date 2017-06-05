@@ -1,4 +1,5 @@
-const path = require('path');
+const {join} = require('path');
+const {spawn} = require('child_process');
 
 class RunJestWhenDone {
   apply(compiler) {
@@ -20,13 +21,27 @@ class RunJestWhenDone {
       //   require('fs').readFileSync(path.join(__dirname, 'webpack-preprocessor.js'))
       // );
 
-      try {
-        require('jest-cli/build/cli').run(['--config', path.join(__dirname, '../jest.config.json'), '--rootDir', path.join(config.context, '.cache/jest/original')]);
-      }
-      catch (e) {
-        console.error(e);
-        require('jest/node_modules/jest-cli/build/cli').run(['--config', path.join(__dirname, '../jest.config.json'), '--rootDir', path.join(config.context, '.cache/jest/original')]);
-      }
+      // try {
+      //   require('jest-cli/build/cli').run(['--config', path.join(__dirname, '../jest.config.json'), '--rootDir']);
+      // }
+      // catch (e) {
+      //   console.error(e);
+      //   require('jest/node_modules/jest-cli/build/cli').run(['--config', path.join(__dirname, '../jest.config.json')]);
+      // }
+
+      const child = spawn(
+        join(config.context, 'node_modules/.bin/jest'),
+        // ['--config', join(config.context, 'jest.config.json')],
+        // ['--rootDir', join(config.context, '.cache/jest/webpack')],
+        [],
+        {
+          cwd: join(config.context, '.cache/jest/webpack'),
+          // env: {
+          //   NODE_ENV: 'test',
+          // },
+          stdio: 'inherit',
+        }
+      );
     });
   }
 }

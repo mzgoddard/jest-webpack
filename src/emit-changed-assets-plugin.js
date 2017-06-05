@@ -38,6 +38,23 @@ class EmitChangedAssetsPlugin {
       cb();
     });
 
+    compiler.plugin('emit', function(compilation, cb) {
+      compilation.assets[join('webpack', 'package.json')] = new RawSource(readFileSync(join(config.context, 'package.json')));
+      cb();
+    });
+
+    compiler.plugin('emit', function(compilation, cb) {
+      Object.keys(compilation.assets).forEach(function(key) {
+        if (/\.map$/.test(key) && /^webpack/.test(key)) {
+          const originalPath = join('original', relative('webpack', key));
+          if (!compilation.assets[originalPath]) {
+            compilation.assets[originalPath] = compilation.assets[key];
+          }
+        }
+      });
+      cb();
+    });
+
     // Don't emit files that were already written correctly. That'll cause jest
     // to run them again.
     compiler.plugin('emit', function(compilation, cb) {
