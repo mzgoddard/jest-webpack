@@ -12,9 +12,9 @@ class RunJestWhenDone {
       // }
       // cliOnce = true;
 
-      if (process.env.NODE_ENV == null) {
-        process.env.NODE_ENV = 'test';
-      }
+      // if (process.env.NODE_ENV == null) {
+      //   process.env.NODE_ENV = 'test';
+      // }
 
       // require('fs').writeFileSync(
       //   path.join(config.context, '.cache/jest/webpack-preprocessor.js'),
@@ -35,10 +35,10 @@ class RunJestWhenDone {
         // ['--rootDir', join(config.context, '.cache/jest/webpack')],
         [],
         {
-          cwd: join(config.context, '.cache/jest/webpack'),
-          // env: {
-          //   NODE_ENV: 'test',
-          // },
+          cwd: join(config.context, '.cache/jest-webpack'),
+          env: Object.assign({}, process.env, {
+            NODE_ENV: 'test',
+          }),
           stdio: 'inherit',
         }
       );

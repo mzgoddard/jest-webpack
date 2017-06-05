@@ -1,7 +1,0 @@
-{
-  "transform": {
-  },
-  "rootDir": ".cache/jest/webpack",
-  "testPathIgnorePatterns": [],
-  "transformIgnorePatterns": []
-}

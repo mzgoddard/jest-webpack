@@ -52,8 +52,9 @@ class JestWebpackPlugin {
   apply(compiler) {
     compiler.options.entry = {};
     compiler.options.output.path = this.options.path ||
-      '.cache/jest';
-    compiler.options.output.filename = 'webpack/[name]';
+      '.cache/jest-webpack';
+    compiler.options.output.filename = '[name]';
+    // Need an appropriate libraryTarget to get the output from a built module.
     compiler.options.output.libraryTarget = 'commonjs2';
     compiler.options.target = 'node';
     // compiler.options.externals = this.externals.bind(this);
