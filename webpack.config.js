@@ -1,7 +1,7 @@
 var path = require('path');
 
 var HardSourceWebpackPlugin = require('hard-source-webpack-plugin');
-var JestWebpackPlugin = require('./src/jest-webpack-plugin');
+// var JestWebpackPlugin = require('./src/jest-webpack-plugin');
 
 var root = process.cwd();
 
@@ -11,12 +11,30 @@ module.exports = {
   // devtool: Enable for source maps. Cheap means only line data. Module means
   // lines of the loader output, in this case the es5 output from babel.
   devtool: 'cheap-source-map',
-  entry: {main: './main.js'},
-  output: {path: path.join(__dirname, 'nowhere'), filename: 'fake'},
+  entry: {
+    'jest-webpack': './src/jest-webpack.js',
+  },
+  output: {
+    path: path.join(__dirname, 'webpack-1'),
+    filename: '[name].js',
+    libraryTarget: 'commonjs2',
+  },
+
+  externals: function(context, request, callback) {
+    if (request.indexOf('!') === -1 && /^\w/.test(request)) {
+      return callback(null, request, 'commonjs2');
+    }
+    callback(null);
+  },
+
   // node: Options for automatic shims for node functionality.
   node: {
     // __dirname: Set false to disable automatic __dirname shim.
     __dirname: false,
+
+    __filename: false,
+
+    process: false,
   },
   // module: module configuration.
   module: {
@@ -32,7 +50,8 @@ module.exports = {
         options: {
           // babel.presets: Plugin presets babel loader will add on top of those
           // specified in babelrc.
-          'presets': ['jest', ['env', {modules: false}]],
+          // 'presets': ['es2015'],
+          'presets': [['env', {targets: {node: 4}}]],
         },
       },
     ],
@@ -54,6 +73,6 @@ module.exports = {
         root: root,
       },
     }),
-    new JestWebpackPlugin(),
+    // new JestWebpackPlugin(),
   ],
 };

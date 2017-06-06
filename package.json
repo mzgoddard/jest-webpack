@@ -3,8 +3,12 @@
   "version": "0.0.1",
   "description": "Use webpack loader and plugins you want to build modules into individual files and test them with jest.",
   "main": "jest-webpack.js",
+  "bin": {
+    "jest-webpack": "./jest-webpack.js"
+  },
   "scripts": {
-    "test": "webpack"
+    "build": "webpack",
+    "test": "node ./jest-webpack.js"
   },
   "keywords": [],
   "author": "Michael \"Z\" Goddard <mzgoddard@gmail.com>",

@@ -1,9 +1,9 @@
-#!/usr/bin/env node
-
 var fs = require('fs');
-var path = require('path');
+var {join} = require('path');
 
 var webpack = require('webpack');
+
+var JestWebpackPlugin = require('./jest-webpack-plugin');
 
 function main(config) {
   // var config = require('./webpack.config');
@@ -16,6 +16,8 @@ function main(config) {
   if (coverageMode) {
     config.babel.plugins = (config.babel.plugins || []).concat('istanbul');
   }
+
+  config.plugins.push(new JestWebpackPlugin());
 
   var compiler = webpack(config);
 
@@ -30,6 +32,9 @@ function main(config) {
   }
 }
 
-if (process.mainModule === module) {
-  main(require(join(process.cwd(), 'webpack.config.js')));
+// let once = true;
+if (process.argv[1] === __filename) {
+  main(eval('require')(join(process.cwd(), 'webpack.config.js')));
 }
+
+module.exports = main;
