@@ -59,15 +59,17 @@ class EmitChangedAssetsPlugin {
     // to run them again.
     compiler.plugin('emit', function(compilation, cb) {
       Object.keys(compilation.assets).forEach(function(key) {
+        // console.log(key);
         try {
           var keyPath = resolve(config.output.path, key);
           var existing = readFileSync(keyPath);
+          console.log(key, hash(existing), hash(compilation.assets[key].source()));
           if (hash(existing) === hash(compilation.assets[key].source())) {
             delete compilation.assets[key];
           }
         }
         catch (err) {
-          console.error(err);
+          // console.error(err);
         }
       });
       cb();

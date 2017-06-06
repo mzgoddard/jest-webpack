@@ -6,14 +6,20 @@ const Module = require('webpack/lib/Module');
 const hash = require('./hash');
 
 class ReferenceEntryModule extends Module {
-  constructor(data) {
+  constructor(data, dep) {
     super();
+    this.data = data;
+    this.dep = dep;
     this.context = data.context;
     this.resource = data.resource;
-    this.requestHash = data.loaders.length ? hash(data.request) : 'default';
     this.dependencies = [];
     this.built = false;
-    this.cacheable = false;
+    this.cacheable = true;
+  }
+
+  get requestHash() {
+    // console.log(hash(this.dep.request), this.dep.request);
+    return this.data.loaders.length ? hash(this.dep.request) : 'default';
   }
 
   identifier() {

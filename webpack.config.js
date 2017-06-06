@@ -39,21 +39,21 @@ module.exports = {
   },
   // plugins: webpack plugins.
   plugins: [
-    // // A webpack cache plugin. A cache is written to the file system and reused
-    // // when possible during later runs for faster builds.
-    // new HardSourceWebpackPlugin({
-    //   cacheDirectory: path.join(root, 'node_modules/.cache/hard-source/[confighash]'),
-    //   recordsPath: path.join(root, 'node_modules/.cache/hard-source/[confighash]/records.json'),
-    //   configHash: function(config) {
-    //     // We can safely ignore entry in our hash. Changes to entry just mean
-    //     // new chunks are built.
-    //     config = Object.assign({}, config, {entry: null});
-    //     return require('node-object-hash')().hash(config);
-    //   },
-    //   environmentPaths: {
-    //     root: root,
-    //   },
-    // }),
+    // A webpack cache plugin. A cache is written to the file system and reused
+    // when possible during later runs for faster builds.
+    new HardSourceWebpackPlugin({
+      cacheDirectory: path.join(root, 'node_modules/.cache/hard-source/[confighash]'),
+      recordsPath: path.join(root, 'node_modules/.cache/hard-source/[confighash]/records.json'),
+      configHash: function(config) {
+        // We can safely ignore entry in our hash. Changes to entry just mean
+        // new chunks are built.
+        config = Object.assign({}, config, {entry: null});
+        return require('node-object-hash')().hash(config);
+      },
+      environmentPaths: {
+        root: root,
+      },
+    }),
     new JestWebpackPlugin(),
   ],
 };

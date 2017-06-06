@@ -8,6 +8,9 @@ const EntryReferenceModule = require('./entry-reference-module');
 const ReferenceEntryModule = require('./reference-entry-module');
 const EntryReferenceDependency = require('./entry-reference-dependency');
 
+const NodeTargetPlugin = require('webpack/lib/node/NodeTargetPlugin');
+const NodeTemplatePlugin = require('webpack/lib/node/NodeTemplatePlugin');
+
 class EntryReferencePlugin {
   constructor(options) {
     this.options = options;
@@ -17,71 +20,62 @@ class EntryReferencePlugin {
     const options = this.options || {};
     const exclude = options.exclude || (path => /node_modules/.test(path));
 
+    let topCompilation;
+
+    compiler.plugin('this-compilation', compilation => {
+      topCompilation = compilation;
+    });
+
     compiler.plugin('compilation', (compilation, {normalModuleFactory}) => {
       compilation.dependencyFactories.set(EntryReferenceDependency, normalModuleFactory);
       compilation.dependencyFactories.set(EntryReferenceTransformDependency, normalModuleFactory);
 
       normalModuleFactory.plugin('before-resolve', (data, callback) => {
         if (typeof data.request === 'object') {
-          data.request = data.request.rawRequest;
+          data.request = data.rawRequest;
         }
         callback(null, data);
       });
 
-      const referenceModules = {};
       normalModuleFactory.plugin('resolver', resolver => (result, callback) => {
+        // console.log('nmf resolver', result);
         const dependency = result.dependencies[0];
-        // console.log(dependency);
 
-        // if (dependency instanceof SingleEntryDependency) {
-        //   return resolver(data, callback);
+        // if (dependency instanceof EntryReferenceTransformDependency) {
+        //   return callback(null, dependency.request);
         // }
-        if (dependency instanceof EntryReferenceTransformDependency) {
-          return callback(null, dependency.request);
-        }
-        else if (dependency instanceof EntryReferenceDependency) {
-          return callback(null, referenceModules[dependency.request.resource]);
+        if (dependency instanceof EntryReferenceDependency) {
+          return callback(null, options.data.entries[dependency.request]);
         }
 
+        // console.log(result.context, result.request, compilation.compiler.options.context, compilation.compiler.options.target, compilation.compiler.options.output.libraryTarget);
         resolver(result, (err, data) => {
           if (err) {
             return callback(err);
           }
+          // console.log('nmf resolver data', data.request, !!data.source);
           if (typeof data.source === 'function') {
             return callback(err, data);
           }
 
+          if (dependency instanceof EntryReferenceTransformDependency) {
+            return callback(null, data);
+          }
+
+          // console.log(data.resource, data.loaders.length === 0, exclude(data.resource));
           if (data.loaders.length === 0 && exclude(data.resource)) {
             // return callback(err, data);
-            return callback(err, new ExternalModule(data.request, 'commonjs2'));
+            return callback(err, new ExternalModule(data.rawRequest, 'commonjs2'));
           }
 
-          if (dependency instanceof SingleEntryDependency) {
-            referenceModules[data.resource] = new EntryReferenceModule(data);
-            return callback(null, referenceModules[data.resource]);
-          }
+          // if (dependency instanceof SingleEntryDependency) {
+          //   referenceModules[data.resource] = new EntryReferenceModule(data);
+          //   return callback(null, referenceModules[data.resource]);
+          // }
 
-          if (!referenceModules[data.resource]) {
-            referenceModules[data.resource] = new EntryReferenceModule(data);
-            return compilation.addEntry(dirname(data.resource), new EntryReferenceDependency(data), relative(compiler.options.context, data.resource), (err, module) => {
-
-              callback(null, new ReferenceEntryModule(data));
-            });
-          }
-          else {
-            const dep = new EntryReferenceTransformDependency(data);
-            referenceModules[data.resource].addData(dep);
-            // if (referenceModules[data.resource].built) {
-              return compilation._addModuleChain(result.context, dep, module => {
-                dep.module = module;
-              }, (err, module) => {
-                return callback(null, new ReferenceEntryModule(data));
-              });
-            // }
-            // else {
-            //   return callback(null, new ReferenceEntryModule(data));
-            // }
-          }
+          options.data.compileModule(data.request, data.resource, (err, dep) => {
+            callback(null, new ReferenceEntryModule(data, dep));
+          });
         });
       });
     });

@@ -1,8 +1,8 @@
 const ModuleDependency = require('webpack/lib/dependencies/ModuleDependency');
 
 class EntryReferenceTransformDependency extends ModuleDependency {
-  constructor(data) {
-    super(data);
+  constructor(request) {
+    super(request);
   }
 }
 

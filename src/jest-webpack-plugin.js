@@ -4,6 +4,7 @@ const EmitChangedAssetsPlugin = require('./emit-changed-assets-plugin');
 const EntryPerModulePlugin = require('./entry-per-module-plugin');
 const EntryReferencePlugin = require('./entry-reference-plugin');
 const RunJestWhenDonePlugin = require('./run-jest-when-done-plugin');
+const SharedData = require('./shared-data');
 const TestEntriesPlugin = require('./test-entries-plugin');
 
 const hash = require('./hash');
@@ -56,15 +57,19 @@ class JestWebpackPlugin {
     compiler.options.output.filename = '[name]';
     // Need an appropriate libraryTarget to get the output from a built module.
     compiler.options.output.libraryTarget = 'commonjs2';
+    // Jest is going to require files like in node. The output chunks need to
+    // module.exports their entry module.
     compiler.options.target = 'node';
     // compiler.options.externals = this.externals.bind(this);
 
+    const shared = new SharedData();
+
     new EmitChangedAssetsPlugin().apply(compiler);
-    new EntryReferencePlugin().apply(compiler);
+    new EntryReferencePlugin({data: shared}).apply(compiler);
     // this.entryPerModule = new EntryPerModulePlugin();
     // this.entryPerModule.apply(compiler);
     new RunJestWhenDonePlugin().apply(compiler);
-    new TestEntriesPlugin().apply(compiler);
+    new TestEntriesPlugin({data: shared}).apply(compiler);
   }
 }
 

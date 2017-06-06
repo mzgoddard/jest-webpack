@@ -4,8 +4,17 @@ const {resolve} = require('path');
 const SingleEntryDependency = require('webpack/lib/dependencies/SingleEntryDependency');
 const SingleEntryPlugin = require('webpack/lib/SingleEntryPlugin');
 
+const NodeTargetPlugin = require('webpack/lib/node/NodeTargetPlugin');
+const NodeTemplatePlugin = require('webpack/lib/node/NodeTemplatePlugin');
+
 class TestEntriesPlugin {
+  constructor(options) {
+    this.options = options;
+  }
+
   apply(compiler) {
+    const options = this.options || {};
+
     compiler.plugin("compilation", (compilation, params) => {
       const normalModuleFactory = params.normalModuleFactory;
 
@@ -37,21 +46,15 @@ class TestEntriesPlugin {
         });
       }
 
-      // console.log(tests);
+      options.data.reset(compilation, () => {
+        cb();
+      });
 
-      Promise.all(tests.map(function(name) {
+      tests.map(function(name) {
         const entry = resolve(compiler.options.context, name);
-        const dep = SingleEntryPlugin.createDependency(entry, name);
-        // console.log(compiler.options.context, dep);
-        return new Promise((resolve, reject) => {
-          compilation.addEntry(compiler.options.context, dep, name, (err, module) => {
-            // console.log('complete', err, module);
-            if (err) {return reject(err);}
-            else {return resolve();}
-          });
-        });
-      }, {}))
-      .then(() => cb(), cb);
+        // const dep = SingleEntryPlugin.createDependency(entry, name);
+        options.data.compileModule(entry, entry, () => {});
+      });
     });
   }
 }

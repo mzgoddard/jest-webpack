@@ -8,11 +8,11 @@ const EntryReferenceTransformDependency = require('./entry-reference-transform-d
 const hash = require('./hash');
 
 class EntryReferenceModule extends Module {
-  constructor(data) {
+  constructor(resource) {
     super();
-    this.context = dirname(data.resource);
-    this.resource = data.resource;
-    this.dependencies = [new EntryReferenceTransformDependency(data)];
+    this.context = dirname(resource);
+    this.resource = resource;
+    this.dependencies = [];
     this.built = false;
     this.cacheable = false;
   }
@@ -36,13 +36,19 @@ class EntryReferenceModule extends Module {
     }
 
     const references = [];
+    const refKeys = {};
     this.dependencies.forEach(dep => {
       if (!dep.module) {return;}
-      if (dep.request.request.indexOf('!') === -1) {
+      if (dep.request.indexOf('!') === -1) {
+        if (refKeys.default) {return;}
+        refKeys.default = true;
         references.push(`  default: __webpack_require__(${dep.module.id})`);
       }
       else {
-        references.push(`  ${JSON.stringify(hash(dep.request.request))}: __webpack_require__(${dep.module.id})`);
+        if (refKeys[hash(dep.request)]) {return;}
+        refKeys[hash(dep.request)] = true;
+        // console.log(hash(dep.request), dep.request);
+        references.push(`  ${JSON.stringify(hash(dep.request))}: __webpack_require__(${dep.module.id})`);
       }
     });
     this._source = new RawSource(`module.exports = {\n${references.join(',\n')}\n};`);
