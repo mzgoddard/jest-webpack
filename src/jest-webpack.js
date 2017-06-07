@@ -17,6 +17,7 @@ function main(config) {
     config.babel.plugins = (config.babel.plugins || []).concat('istanbul');
   }
 
+  config.plugins = config.plugins || [];
   config.plugins.push(new JestWebpackPlugin());
 
   var compiler = webpack(config);

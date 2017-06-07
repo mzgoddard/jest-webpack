@@ -3271,6 +3271,10 @@ webpack-core@~0.6.0:
     source-list-map "~0.1.7"
     source-map "~0.4.1"
 
+webpack-if@^0.0.1:
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/webpack-if/-/webpack-if-0.0.1.tgz#8213d63a80a57c30f23ffba90e524edaf014ef81"
+
 webpack-sources@^0.1.2:
   version "0.1.5"
   resolved "https://registry.yarnpkg.com/webpack-sources/-/webpack-sources-0.1.5.tgz#aa1f3abf0f0d74db7111c40e500b84f966640750"

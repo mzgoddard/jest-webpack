@@ -8,7 +8,8 @@
   },
   "scripts": {
     "build": "webpack",
-    "test": "node ./jest-webpack.js"
+    "test": "node ./jest-webpack.js",
+    "prepublishOnly": "NODE_ENV=production npm run build && npm test"
   },
   "keywords": [],
   "author": "Michael \"Z\" Goddard <mzgoddard@gmail.com>",
@@ -22,7 +23,8 @@
     "file-loader": "^0.11.2",
     "hard-source-webpack-plugin": "^0.3.12",
     "jest": "^20.0.4",
-    "webpack": "^2.6.1"
+    "webpack": "^2.6.1",
+    "webpack-if": "^0.0.1"
   },
   "dependencies": {
     "glob": "^7.1.2"
