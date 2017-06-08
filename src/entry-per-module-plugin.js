@@ -36,13 +36,10 @@ class EntryPerModulePlugin {
         }
 
         const dep = SingleEntryPlugin.createDependency(entry, name);
-        // console.log(entryContext, dep);
-
         modules[entry] = false;
         compilation.addEntry(entryContext, dep, name, (error, module) => {
           modules[entry] = true;
           module.name = name;
-          // console.log(modules);
           if (Object.values(modules).reduce((carry, m) => carry && m, true)) {
             Promise.resolve()
             .then(() => cb());

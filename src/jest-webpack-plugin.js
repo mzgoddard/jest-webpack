@@ -1,4 +1,4 @@
-const path = require('path');
+const {join} = require('path');
 
 const EmitChangedAssetsPlugin = require('./emit-changed-assets-plugin');
 const EntryPerModulePlugin = require('./entry-per-module-plugin');
@@ -53,7 +53,7 @@ class JestWebpackPlugin {
   apply(compiler) {
     compiler.options.entry = {};
     compiler.options.output.path = this.options.path ||
-      '.cache/jest-webpack';
+      join(compiler.options.context, '.cache/jest-webpack');
     compiler.options.output.filename = '[name]';
     // Need an appropriate libraryTarget to get the output from a built module.
     compiler.options.output.libraryTarget = 'commonjs2';

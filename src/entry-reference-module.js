@@ -47,7 +47,6 @@ class EntryReferenceModule extends Module {
       else {
         if (refKeys[hash(dep.request)]) {return;}
         refKeys[hash(dep.request)] = true;
-        // console.log(hash(dep.request), dep.request);
         references.push(`  ${JSON.stringify(hash(dep.request))}: __webpack_require__(${dep.module.id})`);
       }
     });

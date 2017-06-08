@@ -10,6 +10,10 @@ else {
   main = require('./src/jest-webpack.js');
 }
 
+if (!process.env.NODE_ENV) {
+  process.env.NODE_ENV = 'test';
+}
+
 var config;
 try {
   var resolved = require.resolve(join(process.cwd(), 'webpack.config.babel.js'));

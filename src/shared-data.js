@@ -69,7 +69,6 @@ class SharedData {
   }
 
   completeEntry(resource, error) {
-    // console.log('completeEntry', resource);
     this.entryErrors[resource] = error;
     this.entryCompleted[resource] = true;
     this.entriesCompleted++;
@@ -86,7 +85,6 @@ class SharedData {
   }
 
   completeModule(request, error) {
-    // console.log('completeModule', request);
     this.moduleErrors[request] = error;
     this.modulesCompleted++;
 
@@ -98,7 +96,6 @@ class SharedData {
       this.modulesRunning === this.modulesCompleted &&
       this.entriesCompleted === this.entriesRunning
     ) {
-      // console.log('complete!');
       for (let key in this.entryCallbacks) {
         this.entryCallbacks[key](this.entryErrors[key]);
       }
@@ -106,8 +103,6 @@ class SharedData {
   }
 
   compileFile(resource, callback) {
-    // console.log('compileFile', resource);
-
     if (this.entryCompleted[resource]) {
       return callback();
     }
@@ -125,7 +120,8 @@ class SharedData {
 
       const _this = this;
 
-      const child = this.compilation.compiler.createChildCompiler(this.compilation, shortResource, {}, [
+      const child = this.compilation.compiler.createChildCompiler(this.compilation, shortResource);
+      [
         new NodeTemplatePlugin({
           asyncChunkLoading: false,
         }),
@@ -162,7 +158,7 @@ class SharedData {
             });
           },
         },
-      ]);
+      ].forEach(plugin => plugin.apply(child));
       child.runAsChild(err => {
         this.completeFile(resource, err);
       });
@@ -170,7 +166,6 @@ class SharedData {
   }
 
   compileModule(request, resource, callback) {
-    // console.log('compileModule', request, resource);
     this.compileFile(resource, () => {
       if (!this.modules[request]) {
         this.startModule(request);

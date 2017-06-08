@@ -18,7 +18,6 @@ class ReferenceEntryModule extends Module {
   }
 
   get requestHash() {
-    // console.log(hash(this.dep.request), this.dep.request);
     return this.data.loaders.length ? hash(this.dep.request) : 'default';
   }
 

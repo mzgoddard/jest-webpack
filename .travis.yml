@@ -1,0 +1,16 @@
+language: node_js
+cache: yarn
+matrix:
+  fast_finish: true
+  include:
+    - node_js: 7
+      env: WEBPACK_VERSION=1.13.1 BABEL_LOADER=6
+    - node_js: 7
+      env: WEBPACK_VERSION=2.2.1 BABEL_LOADER=7
+    - node_js: 4
+      env: WEBPACK_VERSION=1.13.1 BABEL_LOADER=6
+before_script:
+  - npm install webpack@$WEBPACK_VERSION babel-loader@$BABEL_LOADER
+script:
+  - npm run build
+  - npm test

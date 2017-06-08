@@ -11,12 +11,10 @@ class EmitChangedAssetsPlugin {
 
     // // Create assets for original source files that changed.
     // compiler.plugin('emit', function(compilation, cb) {
-    //   // console.log('emit');
     //   const originals = {};
     //   const context = compiler.options.context;
     //   compilation.modules.forEach(module => {
     //     if (!module.resource) {return;}
-    //     // console.log(module.resource, module.reasons);
     //     const resource = module.resource;
     //     let name = relative(context, resource);
     //     if (module.reasons[0] && module.reasons[0].dependency.loc) {
@@ -39,7 +37,13 @@ class EmitChangedAssetsPlugin {
     // });
 
     compiler.plugin('emit', function(compilation, cb) {
-      compilation.assets['package.json'] = new RawSource(readFileSync(join(config.context, 'package.json')));
+      try {
+        compilation.assets['package.json'] =
+          new RawSource(readFileSync(join(config.context, 'package.json')));
+      }
+      catch (err) {
+        return cb(err);
+      }
       cb();
     });
 
@@ -58,19 +62,21 @@ class EmitChangedAssetsPlugin {
     // Don't emit files that were already written correctly. That'll cause jest
     // to run them again.
     compiler.plugin('emit', function(compilation, cb) {
-      Object.keys(compilation.assets).forEach(function(key) {
-        // console.log(key);
-        try {
-          var keyPath = resolve(config.output.path, key);
-          var existing = readFileSync(keyPath);
-          if (hash(existing) === hash(compilation.assets[key].source())) {
-            delete compilation.assets[key];
+      try {
+        Object.keys(compilation.assets).forEach(function(key) {
+          try {
+            var keyPath = resolve(config.output.path, key);
+            var existing = readFileSync(keyPath);
+            if (hash(existing) === hash(compilation.assets[key].source())) {
+              delete compilation.assets[key];
+            }
           }
-        }
-        catch (err) {
-          // console.error(err);
-        }
-      });
+          catch (err) {}
+        });
+      }
+      catch (err) {
+        return cb(err);
+      }
       cb();
     });
   }

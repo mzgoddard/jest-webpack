@@ -1,5 +1,7 @@
 # @mzgoddard/jest-webpack
 
+[![Build Status](https://travis-ci.org/mzgoddard/jest-webpack.svg?branch=master)](https://travis-ci.org/mzgoddard/jest-webpack)
+
 A helper tool and webpack plugin to integrate jest and webpack.
 
 This project is currently a rough implementation. At this time it can be used by adding the contained JestWebpackPlugin to a webpack config and running webpack with that config. The tool does not yet integrate with jest configuration options or flags.

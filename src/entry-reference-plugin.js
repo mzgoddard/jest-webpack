@@ -38,8 +38,7 @@ class EntryReferencePlugin {
       });
 
       normalModuleFactory.plugin('resolver', resolver => (result, callback) => {
-        // console.log('nmf resolver', result);
-        const dependency = result.dependencies[0];
+        const dependency = result.dependency || result.dependencies[0];
 
         // if (dependency instanceof EntryReferenceTransformDependency) {
         //   return callback(null, dependency.request);
@@ -48,12 +47,10 @@ class EntryReferencePlugin {
           return callback(null, options.data.entries[dependency.request]);
         }
 
-        // console.log(result.context, result.request, compilation.compiler.options.context, compilation.compiler.options.target, compilation.compiler.options.output.libraryTarget);
         resolver(result, (err, data) => {
           if (err) {
             return callback(err);
           }
-          // console.log('nmf resolver data', data.request, !!data.source);
           if (typeof data.source === 'function') {
             return callback(err, data);
           }
@@ -62,7 +59,6 @@ class EntryReferencePlugin {
             return callback(null, data);
           }
 
-          // console.log(data.resource, data.loaders.length === 0, exclude(data.resource));
           if (data.loaders.length === 0 && exclude(data.resource)) {
             // return callback(err, data);
             return callback(err, new ExternalModule(data.rawRequest, 'commonjs2'));

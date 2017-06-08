@@ -54,7 +54,7 @@ module.exports = webpackIf({
   module: {
     // rules: Loaders automatically applied based on test, include, and
     // exclude options.
-    [ifWebpack1('loader', 'rules')]: [
+    [ifWebpack1('loaders', 'rules')]: [
       // Apply babel-loader to any js file not under node_modules.
       {
         test: /\.jsx?$/,
