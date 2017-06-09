@@ -42,6 +42,11 @@ class RunJestWhenDone {
           stdio: 'inherit',
         }
       );
+      child.on('exit', code => {
+        if (code) {
+          process.exit(code);
+        }
+      });
     });
   }
 }
