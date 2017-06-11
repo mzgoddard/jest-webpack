@@ -1,6 +1,6 @@
 # @mzgoddard/jest-webpack
 
-[![Build Status](https://travis-ci.org/mzgoddard/jest-webpack.svg?branch=master)](https://travis-ci.org/mzgoddard/jest-webpack)
+[![Build Status](https://travis-ci.org/mzgoddard/jest-webpack.svg?branch=master)](https://travis-ci.org/mzgoddard/jest-webpack) [![Build status](https://ci.appveyor.com/api/projects/status/g4xvtyepm30hf48i/branch/master?svg=true)](https://ci.appveyor.com/project/mzgoddard/jest-webpack/branch/master)
 
 A helper tool and webpack plugin to integrate jest and webpack.
 
