@@ -25,6 +25,9 @@
     "jest": "^20.0.4",
     "jest-cli": "^20.0.4",
     "node-object-hash": "^1.2.0",
+    "raw-loader": "^0.5.1",
+    "regenerator-runtime": "^0.10.5",
+    "rimraf": "^2.6.1",
     "source-map-support": "^0.4.15",
     "webpack": "^2.1.0 || ^1.13.0",
     "webpack-if": "^0.0.1"
