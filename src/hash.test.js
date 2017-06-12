@@ -1,4 +1,4 @@
-require('source-map-support').install({hookRequire: true});
+// require('source-map-support').install({hookRequire: true});
 
 const hash = require('./hash');
 
