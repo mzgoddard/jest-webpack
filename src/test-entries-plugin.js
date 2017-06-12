@@ -53,7 +53,7 @@ class TestEntriesPlugin {
       tests.map(function(name) {
         const entry = resolve(compiler.options.context, name);
         // const dep = SingleEntryPlugin.createDependency(entry, name);
-        options.data.compileModule(entry, entry, () => {});
+        options.data.compileModule(entry, entry, () => {}, true);
       });
     });
   }

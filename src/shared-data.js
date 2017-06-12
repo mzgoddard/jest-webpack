@@ -165,7 +165,7 @@ class SharedData {
     }
   }
 
-  compileModule(request, resource, callback) {
+  compileModule(request, resource, callback, isEntry = false) {
     this.compileFile(resource, () => {
       if (!this.modules[request]) {
         this.startModule(request);
@@ -177,13 +177,17 @@ class SharedData {
         ._addModuleChain(dirname(resource), dep, module => {
           dep.module = module;
           dep.request = module.request;
+          if (isEntry) {
+            this.entries[resource].isEntry = true;
+            this.entries[resource].entryRequest = module.request;
+          }
         }, (err, module) => {
           this.completeModule(request, err);
         });
 
         callback(null, dep);
       }
-    });
+    }, isEntry);
   }
 
   // compileDependency(dep) {
