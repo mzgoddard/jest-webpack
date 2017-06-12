@@ -31,13 +31,13 @@
   },
   "peerDependencies": {
     "jest": "*",
-    "jest-cli": "*",
     "webpack": "*"
   },
   "optionalDependencies": {
     "babel-register": "*"
   },
   "dependencies": {
+    "find-up": "^2.1.0",
     "glob": "^7.1.2",
     "webpack-sources": "^1.0.1"
   }

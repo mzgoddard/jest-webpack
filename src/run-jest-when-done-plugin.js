@@ -2,6 +2,8 @@ const {statSync} = require('fs');
 const {join} = require('path');
 const {spawn} = require('child_process');
 
+const findUp = require('find-up');
+
 class RunJestWhenDone {
   apply(compiler) {
     // var cliOnce = false;
@@ -30,7 +32,10 @@ class RunJestWhenDone {
       //   require('jest/node_modules/jest-cli/build/cli').run(['--config', path.join(__dirname, '../jest.config.json')]);
       // }
 
-      const _jestPath = join(config.context, 'node_modules/.bin/jest');
+      // const _jestPath = join(config.context, 'node_modules/.bin/jest');
+      const _jestPath = findUp.sync('node_modules/.bin/jest', {
+        cwd: __dirname,
+      });
       const _jestWindowsPath = _jestPath + '.cmd';
 
       let jestPath;
