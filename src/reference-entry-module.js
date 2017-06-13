@@ -1,7 +1,8 @@
 const {dirname, relative} = require('path');
 
-const RawSource = require('webpack-sources/lib/RawSource');
 const Module = require('webpack/lib/Module');
+const NullDependency = require('webpack/lib/dependencies/NullDependency');
+const RawSource = require('webpack-sources/lib/RawSource');
 
 const hash = require('./hash');
 
@@ -14,7 +15,9 @@ class ReferenceEntryModule extends Module {
     this.resource = data.resource;
     this.dependencies = [];
     this.built = false;
-    this.cacheable = true;
+    this.cacheable = false;
+    this.isSelfReference = false;
+    this.selfModule = null;
   }
 
   get requestHash() {
@@ -35,7 +38,18 @@ class ReferenceEntryModule extends Module {
   }
 
   source() {
-    return new RawSource(`module.exports = require(${JSON.stringify('./' + relative(this.context, this.resource))})[${JSON.stringify(this.requestHash)}];`);
+    if (!this._source) {
+      let moduleRequire = `require(${JSON.stringify('./' + relative(this.context, this.resource))})`;
+      if (this.isSelfReference) {
+        moduleRequire = `__webpack_require__(${this.selfModule.id})`;
+        this.dependencies.push(new NullDependency());
+      }
+      const moduleIdHash = JSON.stringify(this.requestHash);
+      this._source = new RawSource(
+        `module.exports = ${moduleRequire}[${moduleIdHash}]();`
+      );
+    }
+    return this._source;
   }
 
   size() {

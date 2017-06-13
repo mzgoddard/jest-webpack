@@ -74,6 +74,38 @@ class EntryReferencePlugin {
           });
         });
       });
+
+      compilation.plugin('seal', () => {
+        const entries = {};
+        const refs = {};
+        compilation.modules.forEach(module => {
+          if (module instanceof EntryReferenceModule) {
+            entries[module.resource] = module;
+            if (refs[module.resource]) {
+              const entryModule = module;
+              refs[module.resource].map(refModule => {
+                refModule.isSelfReference = true;
+                refModule.selfModule = entryModule;
+              });
+            }
+          }
+          else if (module instanceof ReferenceEntryModule) {
+            refs[module.resource] =
+              (refs[module.resource] || []).concat(module);
+            if (entries[module.resource]) {
+              const entryModule = entries[module.resource];
+              const refModule = module;
+              refModule.isSelfReference = true;
+              refModule.selfModule = entryModule;
+            }
+          }
+        });
+        // compilation.modules.forEach(module => {
+        //   if (module instanceof ReferenceEntryModule) {
+        //     module.cacheable = !module.isSelfReference;
+        //   }
+        // });
+      });
     });
   }
 }

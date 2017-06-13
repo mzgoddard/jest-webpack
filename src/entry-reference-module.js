@@ -12,6 +12,8 @@ class EntryReferenceModule extends Module {
     super();
     this.context = dirname(resource);
     this.resource = resource;
+    this.isEntry = false;
+    this.entryRequest = null;
     this.dependencies = [];
     this.built = false;
     this.cacheable = false;
@@ -42,15 +44,22 @@ class EntryReferenceModule extends Module {
       if (dep.request.indexOf('!') === -1) {
         if (refKeys.default) {return;}
         refKeys.default = true;
-        references.push(`  default: __webpack_require__(${dep.module.id})`);
+        references.push(`  default: function() {return __webpack_require__(${dep.module.id});}`);
       }
       else {
         if (refKeys[hash(dep.request)]) {return;}
         refKeys[hash(dep.request)] = true;
-        references.push(`  ${JSON.stringify(hash(dep.request))}: __webpack_require__(${dep.module.id})`);
+        references.push(`  ${JSON.stringify(hash(dep.request))}: function() {return __webpack_require__(${dep.module.id});}`);
       }
     });
-    this._source = new RawSource(`module.exports = {\n${references.join(',\n')}\n};`);
+    let rawSource = `module.exports = {\n${references.join(',\n')}\n};\n`;
+    if (this.isEntry) {
+      const requestHash = this.entryRequest.indexOf('!') === -1 ?
+        'default' :
+        hash(this.entryRequest);
+      rawSource += `module.exports[${JSON.stringify(requestHash)}]();\n`;
+    }
+    this._source = new RawSource(rawSource);
     return this._source;
   }
 

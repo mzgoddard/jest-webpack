@@ -21,23 +21,25 @@
     "babel-preset-env": "^1.5.1",
     "babel-preset-jest": "^20.0.3",
     "file-loader": "^0.11.2",
-    "hard-source-webpack-plugin": "^0.3.12",
+    "hard-source-webpack-plugin": "^0.4.4",
     "jest": "^20.0.4",
-    "jest-cli": "^20.0.4",
     "node-object-hash": "^1.2.0",
+    "raw-loader": "^0.5.1",
+    "regenerator-runtime": "^0.10.5",
+    "rimraf": "^2.6.1",
     "source-map-support": "^0.4.15",
     "webpack": "^2.1.0 || ^1.13.0",
-    "webpack-if": "^0.0.1"
+    "webpack-if": "^0.1.1"
   },
   "peerDependencies": {
     "jest": "*",
-    "jest-cli": "*",
     "webpack": "*"
   },
   "optionalDependencies": {
     "babel-register": "*"
   },
   "dependencies": {
+    "find-up": "^2.1.0",
     "glob": "^7.1.2",
     "webpack-sources": "^1.0.1"
   }
