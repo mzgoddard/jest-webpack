@@ -121,6 +121,7 @@ class SharedData {
       const _this = this;
 
       const child = this.compilation.compiler.createChildCompiler(this.compilation, shortResource);
+      child.records = this.compilation.compiler.records[shortResource][0];
       [
         new NodeTemplatePlugin({
           asyncChunkLoading: false,
@@ -129,18 +130,18 @@ class SharedData {
         new LibraryTemplatePlugin(this.compilation.compiler.options.output.library, this.compilation.compiler.options.output.libraryTarget, this.compilation.compiler.options.output.umdNamedDefine, this.compilation.compiler.options.output.auxiliaryComment || ""),
         {
           apply(compiler) {
-            compiler.plugin('this-compilation', compilation => {
+            compiler.plugin('make', (compilation, cb) => {
+              // Store compilation to add transforms to later.
               _this.compilations[resource] = compilation;
 
+              // Use or create a cache for this compilation in the parent cache.
               if (compilation.cache) {
-                if (!compilation.cache[name]) {
-                  compilation.cache[name] = {};
+                if (!compilation.cache[shortResource]) {
+                  compilation.cache[shortResource] = {};
                 }
-                compilation.cache = compilation.cache[name];
+                compilation.cache = compilation.cache[shortResource];
               }
-            });
 
-            compiler.plugin('make', (compilation, cb) => {
               _this.startEntry(resource, cb);
               return compilation.addEntry(
                 // context
@@ -171,12 +172,12 @@ class SharedData {
         this.startModule(request);
 
         const dep = new EntryReferenceTransformDependency(request);
-        this.entries[resource].addData(dep);
 
         this.compilations[resource]
         ._addModuleChain(dirname(resource), dep, module => {
           dep.module = module;
           dep.request = module.request;
+          this.entries[resource].addData(dep);
           if (isEntry) {
             this.entries[resource].isEntry = true;
             this.entries[resource].entryRequest = module.request;
@@ -185,6 +186,10 @@ class SharedData {
           this.completeModule(request, err);
         });
 
+        callback(null, dep);
+      }
+      else {
+        const dep = this.entries[resource].dependencies.find(dep => dep.request === request);
         callback(null, dep);
       }
     }, isEntry);

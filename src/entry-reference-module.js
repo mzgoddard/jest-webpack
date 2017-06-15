@@ -68,6 +68,10 @@ class EntryReferenceModule extends Module {
   }
 
   addData(dep) {
+    const index = this.dependencies.findIndex(_dep => _dep.request === dep.request);
+    if (index !== -1) {
+      this.dependencies.splice(index, 1);
+    }
     this.dependencies.push(dep);
   }
 }
