@@ -54,7 +54,7 @@ const clean = async fullFixturePath => {
   await rimraf(fullFixturePath);
 };
 
-const run = async fixturePath => {
+const run = async (fixturePath, args = []) => {
   // These paths need to escape the jest-webpack cache.
   const jestWebpackBin = findUp.sync('jest-webpack.js', {
     cwd: __dirname,
@@ -66,7 +66,7 @@ const run = async fixturePath => {
 
   const child = spawn(process.argv[0], [
     jestWebpackBin,
-  ], {
+  ].concat(args), {
     cwd: fullFixturePath,
     stdio: 'pipe',
   });

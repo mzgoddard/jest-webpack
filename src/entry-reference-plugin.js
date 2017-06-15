@@ -40,9 +40,6 @@ class EntryReferencePlugin {
       normalModuleFactory.plugin('resolver', resolver => (result, callback) => {
         const dependency = result.dependency || result.dependencies[0];
 
-        // if (dependency instanceof EntryReferenceTransformDependency) {
-        //   return callback(null, dependency.request);
-        // }
         if (dependency instanceof EntryReferenceDependency) {
           return callback(null, options.data.entries[dependency.request]);
         }
@@ -52,7 +49,13 @@ class EntryReferencePlugin {
             return callback(err);
           }
           if (typeof data.source === 'function') {
-            return callback(err, data);
+            return options.data.compileFile(data.resource, () => {
+              const dep = new EntryReferenceTransformDependency(data.request);
+              dep.userRequest = data.userRequest;
+              dep.module = data;
+              options.data.entries[data.resource].addData(dep);
+              callback(err, data);
+            });
           }
 
           if (dependency instanceof EntryReferenceTransformDependency) {
@@ -60,17 +63,21 @@ class EntryReferencePlugin {
           }
 
           if (data.loaders.length === 0 && exclude(data.resource)) {
-            // return callback(err, data);
             return callback(err, new ExternalModule(data.rawRequest, 'commonjs2'));
           }
 
-          // if (dependency instanceof SingleEntryDependency) {
-          //   referenceModules[data.resource] = new EntryReferenceModule(data);
-          //   return callback(null, referenceModules[data.resource]);
-          // }
-
           options.data.compileModule(data.request, data.resource, (err, dep) => {
-            callback(null, new ReferenceEntryModule(data, dep));
+            if (err) {
+              return callback(err);
+            }
+
+            const shortResource = relative(compilation.compiler.options.context, data.resource);
+            if (compilation.compiler.name === shortResource) {
+              callback(null, data);
+            }
+            else {
+              callback(null, new ReferenceEntryModule(data, dep));
+            }
           });
         });
       });
@@ -88,6 +95,15 @@ class EntryReferencePlugin {
                 refModule.selfModule = entryModule;
               });
             }
+
+            // Ensure modules are in the compilation modules list.
+            module.dependencies.forEach(dep => {
+              if (compilation.modules.indexOf(dep.module) === -1) {
+                dep.module = compilation.modules.find(module => (
+                  module.identifier() === dep.module.identifier()
+                )``);
+              }
+            });
           }
           else if (module instanceof ReferenceEntryModule) {
             refs[module.resource] =
@@ -100,11 +116,6 @@ class EntryReferencePlugin {
             }
           }
         });
-        // compilation.modules.forEach(module => {
-        //   if (module instanceof ReferenceEntryModule) {
-        //     module.cacheable = !module.isSelfReference;
-        //   }
-        // });
       });
     });
   }

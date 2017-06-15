@@ -51,7 +51,7 @@ class RunJestWhenDone {
         jestPath,
         // ['--config', join(config.context, 'jest.config.json')],
         // ['--rootDir', join(config.context, '.cache/jest/webpack')],
-        [],
+        process.argv.slice(2),
         {
           cwd: join(config.context, '.cache/jest-webpack'),
           env: Object.assign({}, process.env, {
