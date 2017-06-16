@@ -2,6 +2,10 @@
   "name": "@mzgoddard/jest-webpack",
   "version": "0.0.8",
   "description": "Use webpack loader and plugins you want to build modules into individual files and test them with jest.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mzgoddard/jest-webpack"
+  },
   "main": "jest-webpack.js",
   "bin": {
     "jest-webpack": "./jest-webpack.js"
@@ -11,7 +15,12 @@
     "test": "node ./jest-webpack.js --runInBand",
     "prepublishOnly": "NODE_ENV=production npm run build && npm test"
   },
-  "keywords": [],
+  "keywords": [
+    "jest",
+    "webpack",
+    "plugin",
+    "webpack plugin"
+  ],
   "author": "Michael \"Z\" Goddard <mzgoddard@gmail.com>",
   "license": "ISC",
   "devDependencies": {
