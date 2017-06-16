@@ -9,9 +9,6 @@ module.exports = {
     filename: '[name].js'
   },
   plugins: [
-    new HardSourceWebpackPlugin({
-      cacheDirectory: __dirname + '/node_modules/.cache/hard-source/[confighash]',
-      configHash: require('node-object-hash')({sort: false}).hash,
-    })
+    new HardSourceWebpackPlugin()
   ]
 };
