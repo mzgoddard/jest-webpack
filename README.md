@@ -2,9 +2,48 @@
 
 [![Build Status](https://travis-ci.org/mzgoddard/jest-webpack.svg?branch=master)](https://travis-ci.org/mzgoddard/jest-webpack) [![Build status](https://ci.appveyor.com/api/projects/status/g4xvtyepm30hf48i/branch/master?svg=true)](https://ci.appveyor.com/project/mzgoddard/jest-webpack/branch/master)
 
-A helper tool and webpack plugin to integrate jest and webpack.
+A helper tool and webpack plugin to integrate [`jest`](https://facebook.github.io/jest/) and [`webpack`](https://webpack.js.org/).
 
-This project is currently a rough implementation. At this time it can be used by adding the contained JestWebpackPlugin to a webpack config and running webpack with that config. The tool does not yet integrate with jest configuration options or flags.
+Add it to your project as a developer dependency. And run it like `webpack` or `webpack-dev-server` from the command line or as a `package.json` script.
+
+#### Install
+
+```sh
+npm install --save-dev @mzgoddard/jest-webpack
+```
+
+or with `yarn`
+
+```sh
+yarn add -D @mzgoddard/jest-webpack
+```
+
+#### Update package.json
+
+Add it as a `package.json` script
+
+```json
+{
+  "name": "my-package",
+  "scripts": {
+    "test": "jest-webpack"
+```
+
+#### Run it
+
+```sh
+npm test
+```
+
+Run it with jest options
+
+```sh
+npm test -- --testPathPattern test-just-this-file
+```
+
+## Status
+
+`@mzgoddard/jest-webpack` currently works with a lot of jest options out of the bag since there is no special handling needed and they can just be passed to jest by the tool. You can see what is so far specifically tested so far in https://github.com/mzgoddard/jest-webpack/issues/3.
 
 ## How it works?
 
