@@ -5,6 +5,10 @@ const {spawn} = require('child_process');
 const findUp = require('find-up');
 
 class RunJestWhenDone {
+  constructor(options = {}) {
+    this.options = options;
+  }
+
   apply(compiler) {
     // var cliOnce = false;
 
@@ -32,7 +36,6 @@ class RunJestWhenDone {
       //   require('jest/node_modules/jest-cli/build/cli').run(['--config', path.join(__dirname, '../jest.config.json')]);
       // }
 
-      // const _jestPath = join(config.context, 'node_modules/.bin/jest');
       const _jestPath = findUp.sync('node_modules/.bin/jest', {
         cwd: __dirname,
       });
@@ -47,11 +50,10 @@ class RunJestWhenDone {
         jestPath = _jestPath;
       }
 
+      const argv = process.argv.slice(2);
       const child = spawn(
         jestPath,
-        // ['--config', join(config.context, 'jest.config.json')],
-        // ['--rootDir', join(config.context, '.cache/jest/webpack')],
-        process.argv.slice(2),
+        argv,
         {
           cwd: join(config.context, '.cache/jest-webpack'),
           env: Object.assign({}, process.env, {
