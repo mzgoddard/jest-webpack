@@ -7,6 +7,27 @@ const SingleEntryPlugin = require('webpack/lib/SingleEntryPlugin');
 const NodeTargetPlugin = require('webpack/lib/node/NodeTargetPlugin');
 const NodeTemplatePlugin = require('webpack/lib/node/NodeTemplatePlugin');
 
+// Try and require jest's handling for finding source files so we can get the
+// test files jest will test once the webpack step is complete.
+const tryRequire = require('./try-require');
+const SearchSource = tryRequire(
+  () => require('jest/node_modules/jest-cli/build/SearchSource'),
+  () => require('jest-cli/build/SearchSource')
+);
+const createContext = tryRequire(
+  () => require('jest/node_modules/jest-cli/build/lib/createContext'),
+  () => require('jest-cli/build/lib/createContext')
+);
+const Runtime = tryRequire(
+  () => require('jest/node_modules/jest-cli/node_modules/jest-runtime'),
+  () => require('jest-cli/node_modules/jest-runtime'),
+  () => require('jest-runtime')
+);
+const getTestPathPattern = tryRequire(
+  () => require('jest/node_modules/jest-cli/build/lib/getTestPathPattern'),
+  () => require('jest-cli/build/lib/getTestPathPattern')
+);
+
 class TestEntriesPlugin {
   constructor(options) {
     this.options = options;
@@ -22,39 +43,40 @@ class TestEntriesPlugin {
     });
 
     compiler.plugin('make', (compilation, cb) => {
-      var tests;
+      const {jestArgv, jestConfig} = options;
+
+      const configIgnoreJestWebpack = Object.assign({}, jestConfig.config, {
+        modulePathIgnorePatterns:
+          (jestConfig.config.modulePathIgnorePatterns || [])
+          .concat(['/.cache/jest-webpack/']),
+        testPathIgnorePatterns: jestConfig.config.testPathIgnorePatterns
+          .concat(['/.cache/jest-webpack/']),
+      });
+
       try {
-        var jestinclude = readFileSync('.jestinclude', 'utf8');
-        tests = [].concat.apply(
-          [],
-          jestinclude
-          .split('\n')
-          .map(function(include) {
-            if (/^\s*#/.test(include)) {return;}
-            if (/^\s*$/.test(include)) {return;}
-            return require('glob').sync(include, {
-              cwd: compiler.options.context,
-              ignore: ['**/node_modules/**', '**/tmp/**', '**/dist/**'],
-            });
-          })
-          .filter(Boolean)
-        );
+        require('fs').mkdirSync(configIgnoreJestWebpack.cacheDirectory);
       }
-      catch (err) {
-        tests = require('glob').sync('{__tests__/**/*.js,src/**/*.test.js}', {
-          cwd: compiler.options.context,
+      catch (_) {}
+
+      Runtime.createHasteMap(configIgnoreJestWebpack).build()
+      .then(hasteMap => createContext(configIgnoreJestWebpack, hasteMap))
+      .then(jestContext => {
+        const searchSource = new SearchSource(jestContext);
+        const testPathPattern = getTestPathPattern(jestArgv);
+        return searchSource.findMatchingTests(testPathPattern)
+        .tests.map(test => test.path);
+      })
+      .then(tests => {
+        options.data.reset(compilation, () => {
+          cb();
         });
-      }
 
-      options.data.reset(compilation, () => {
-        cb();
-      });
-
-      tests.map(function(name) {
-        const entry = resolve(compiler.options.context, name);
-        // const dep = SingleEntryPlugin.createDependency(entry, name);
-        options.data.compileModule(entry, entry, () => {}, true);
-      });
+        tests.map(function(name) {
+          const entry = resolve(compiler.options.context, name);
+          options.data.compileModule(entry, entry, () => {}, true);
+        });
+      })
+      .catch(cb);
     });
   }
 }

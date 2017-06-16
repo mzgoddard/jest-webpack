@@ -1,7 +1,10 @@
 var {join, resolve} = require('path');
 
 var HardSourceWebpackPlugin = require('hard-source-webpack-plugin');
+var webpack = require('webpack');
 var webpackIf = require('webpack-if');
+
+var ProvidePlugin = webpack.ProvidePlugin;
 
 var root = process.cwd();
 

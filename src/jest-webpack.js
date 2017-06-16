@@ -1,29 +1,54 @@
-var fs = require('fs');
-var {join} = require('path');
+const fs = require('fs');
+const {join} = require('path');
 
-var webpack = require('webpack');
+const webpack = require('webpack');
 
-var JestWebpackPlugin = require('./jest-webpack-plugin');
+const JestWebpackPlugin = require('./jest-webpack-plugin');
+
+// Try to require jest's specific dependencies to mirror its argv and config
+// behaviour to try and match how it determines things like test files to
+// execute.
+const tryRequire = require('./try-require');
+const {readConfig} = tryRequire(
+  () => require('jest/node_modules/jest-cli/node_modules/jest-config'),
+  () => require('jest-cli/node_modules/jest-config'),
+  () => require('jest-config')
+);
+const yargs = tryRequire(
+  () => require('jest/node_modules/jest-cli/node_modules/yargs'),
+  () => require('jest-cli/node_modules/yargs'),
+  () => require('yargs')
+);
+const jestArgs = tryRequire(
+  () => require('jest/node_modules/jest-cli/build/cli/args'),
+  () => require('jest-cli/build/cli/args')
+);
 
 function main(config) {
-  // var config = require('./webpack.config');
-
   // Ensure JestWebpackPlugin is active
 
-  var coverageMode = process.argv
-  .reduce(function(carry, opt) {return carry || /^--coverage$/.test(opt);}, false);
+  // Echo jest's argv and jest config behaviour
+  const jestArgv = yargs(process.argv.slice(2))
+    .options(jestArgs.options)
+    .check(jestArgs.check).argv;
+  const jestConfig = readConfig(jestArgv, config.context);
 
-  if (coverageMode) {
-    config.babel.plugins = (config.babel.plugins || []).concat('istanbul');
-  }
+  // var coverageMode = process.argv
+  // .reduce(function(carry, opt) {return carry || /^--coverage$/.test(opt);}, false);
+
+  // if (coverageMode) {
+  //   config.babel.plugins = (config.babel.plugins || []).concat('istanbul');
+  // }
 
   config.plugins = config.plugins || [];
-  config.plugins.push(new JestWebpackPlugin());
+  config.plugins.push(new JestWebpackPlugin({jestArgv, jestConfig}));
 
   var compiler = webpack(config);
 
-  var watchMode = process.argv
-  .reduce(function(carry, opt) {return carry || /^--watch/.test(opt);}, false);
+  // var watchMode = process.argv
+  // .reduce(function(carry, opt) {return carry || /^--watch/.test(opt);}, false);
+
+  const watchMode = false;
 
   if (watchMode) {
     compiler.watch({}, function() {});

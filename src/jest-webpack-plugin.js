@@ -10,8 +10,8 @@ const TestEntriesPlugin = require('./test-entries-plugin');
 const hash = require('./hash');
 
 class JestWebpackPlugin {
-  constructor(options) {
-    this.options = options || {};
+  constructor(options = {}) {
+    this.options = options;
   }
 
   // externals: Treat dependencies that match any test in this option as
@@ -22,24 +22,6 @@ class JestWebpackPlugin {
     const requestParts = request.split('!');
     const resource = requestParts[requestParts.length - 1];
 
-    // // Inline modules with full path requests. As the jest script sets entry to
-    // // full path requests, this will let us build those modules. Any other
-    // // modules must be built as another entry or not require webpack work.
-    // if (/^\//.test(resource)) {
-    //   return cb(null);
-    // }
-    // // Any relative requests (e.g. ./app-card) are external and must be built as
-    // // their own entry/chunk.
-    // if (/^\./.test(resource)) {
-    //   const absoluteResource = path.resolve(context, resource);
-    //   let hashedRequest = '';
-    //   if (requestParts.length > 1) {
-    //     hashedRequest = `.loader-${hash(JSON.stringify([context, request]))}`;
-    //   }
-    //   const uniqueResource = `${absoluteResource}${hashedRequest}`;
-    //   this.entryPerModule.addEntry(uniqueResource, context, request);
-    //   return cb(null, uniqueResource, 'commonjs2');
-    // }
     if (/^\w/.test(resource)) {
       // All other modules are expected to not need webpack work and come from
       // node_modules (e.g. react).
@@ -51,6 +33,8 @@ class JestWebpackPlugin {
   }
 
   apply(compiler) {
+    const {jestArgv, jestConfig} = this.options;
+
     compiler.options.entry = {};
     compiler.options.output.path = this.options.path ||
       join(compiler.options.context, '.cache/jest-webpack');
@@ -69,7 +53,7 @@ class JestWebpackPlugin {
     // this.entryPerModule = new EntryPerModulePlugin();
     // this.entryPerModule.apply(compiler);
     new RunJestWhenDonePlugin().apply(compiler);
-    new TestEntriesPlugin({data: shared}).apply(compiler);
+    new TestEntriesPlugin({data: shared, jestArgv, jestConfig}).apply(compiler);
   }
 }
 

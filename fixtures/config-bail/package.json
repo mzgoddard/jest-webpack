@@ -1,5 +1,5 @@
 {
-  "name": "fixture",
+  "name": "config-bail",
   "version": "1.0.0",
   "jest": {
     "bail": true

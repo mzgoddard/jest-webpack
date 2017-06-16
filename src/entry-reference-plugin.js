@@ -101,7 +101,7 @@ class EntryReferencePlugin {
               if (compilation.modules.indexOf(dep.module) === -1) {
                 dep.module = compilation.modules.find(module => (
                   module.identifier() === dep.module.identifier()
-                )``);
+                ));
               }
             });
           }

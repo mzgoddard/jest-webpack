@@ -7,6 +7,8 @@ matrix:
       env: WEBPACK_VERSION=1 BABEL_LOADER=6
     - node_js: 7
       env: WEBPACK_VERSION=2 BABEL_LOADER=7
+    - node_js: 6
+      env: WEBPACK_VERSION=2 BABEL_LOADER=7
     - node_js: 4
       env: WEBPACK_VERSION=1 BABEL_LOADER=6
 before_script:
