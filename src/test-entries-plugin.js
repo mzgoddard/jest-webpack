@@ -75,6 +75,10 @@ class TestEntriesPlugin {
           const entry = resolve(compiler.options.context, name);
           options.data.compileModule(entry, entry, () => {}, true);
         });
+
+        if (options.data.filesRunning === 0) {
+          cb();
+        }
       })
       .catch(cb);
     });
