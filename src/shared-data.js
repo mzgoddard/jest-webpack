@@ -1,4 +1,4 @@
-const {dirname, relative} = require('path');
+const {basename, dirname, join, relative, sep} = require('path');
 
 const NodeTemplatePlugin = require('webpack/lib/node/NodeTemplatePlugin');
 const NodeTargetPlugin = require('webpack/lib/node/NodeTargetPlugin');
@@ -130,6 +130,18 @@ class SharedData {
         new LibraryTemplatePlugin(this.compilation.compiler.options.output.library, this.compilation.compiler.options.output.libraryTarget, this.compilation.compiler.options.output.umdNamedDefine, this.compilation.compiler.options.output.auxiliaryComment || ""),
         {
           apply(compiler) {
+            compiler.plugin('this-compilation', compilation => {
+              compilation.plugin('optimize-assets', (assets, cb) => {
+                Object.keys(assets).forEach(key => {
+                  const newKey = join(dirname(shortResource), basename(key));
+                  if (newKey === key) {return;}
+                  assets[newKey] = assets[key];
+                  delete assets[key];
+                });
+                cb();
+              });
+            });
+
             compiler.plugin('make', (compilation, cb) => {
               // Store compilation to add transforms to later.
               _this.compilations[resource] = compilation;

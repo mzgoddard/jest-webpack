@@ -39,6 +39,7 @@ class JestWebpackPlugin {
     compiler.options.output.path = this.options.path ||
       join(compiler.options.context, '.cache/jest-webpack');
     compiler.options.output.filename = '[name]';
+    compiler.options.output.chunkFilename = '[hash].[id].js';
     // Need an appropriate libraryTarget to get the output from a built module.
     compiler.options.output.libraryTarget = 'commonjs2';
     // Jest is going to require files like in node. The output chunks need to

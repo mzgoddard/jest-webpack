@@ -20,11 +20,11 @@ class EntryReferenceModule extends Module {
   }
 
   identifier() {
-    return `entry reference ${this.resource}`;
+    return `entry reference ${this.resource.split('?')[0]}`;
   }
 
   readableIdentifier(requestShortener) {
-    return `entry reference ${requestShortener.shorten(this.resource)}`;
+    return `entry reference ${requestShortener.shorten(this.resource.split('?')[0])}`;
   }
 
   build(options, compilation, resolver, fs, callback) {
@@ -41,7 +41,7 @@ class EntryReferenceModule extends Module {
     const refKeys = {};
     this.dependencies.forEach(dep => {
       if (!dep.module) {return;}
-      if (dep.request.indexOf('!') === -1) {
+      if (dep.request.indexOf('!') === -1 && dep.request.indexOf('?') === -1) {
         if (refKeys.default) {return;}
         refKeys.default = true;
         references.push(`  default: function() {return __webpack_require__(${dep.module.id});}`);
@@ -54,7 +54,10 @@ class EntryReferenceModule extends Module {
     });
     let rawSource = `module.exports = {\n${references.join(',\n')}\n};\n`;
     if (this.isEntry) {
-      const requestHash = this.entryRequest.indexOf('!') === -1 ?
+      const requestHash = (
+        this.entryRequest.indexOf('!') === -1 &&
+        this.entryRequest.indexOf('?') === -1
+      ) ?
         'default' :
         hash(this.entryRequest);
       rawSource += `module.exports[${JSON.stringify(requestHash)}]();\n`;

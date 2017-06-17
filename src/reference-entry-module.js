@@ -21,15 +21,17 @@ class ReferenceEntryModule extends Module {
   }
 
   get requestHash() {
-    return this.data.loaders.length ? hash(this.dep.request) : 'default';
+    return (this.data.loaders.length || this.data.resource.indexOf('?') !== -1) ?
+      hash(this.dep.request) :
+      'default';
   }
 
   identifier() {
-    return `reference ${this.resource}.${this.requestHash}`;
+    return `reference ${this.resource.split('?')[0]}.${this.requestHash}`;
   }
 
   readableIdentifier(requestShortener) {
-    return `reference ${requestShortener.shorten(this.resource)}.${this.requestHash}`;
+    return `reference ${requestShortener.shorten(this.resource.split('?')[0])}.${this.requestHash}`;
   }
 
   build(options, compilation, resolver, fs, callback) {
@@ -39,7 +41,7 @@ class ReferenceEntryModule extends Module {
 
   source() {
     if (!this._source) {
-      let moduleRequire = `require(${JSON.stringify('./' + relative(this.context, this.resource))})`;
+      let moduleRequire = `require(${JSON.stringify('./' + relative(this.context, this.resource.split('?')[0]))})`;
       if (this.isSelfReference) {
         moduleRequire = `__webpack_require__(${this.selfModule.id})`;
         this.dependencies.push(new NullDependency());

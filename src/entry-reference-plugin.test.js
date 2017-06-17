@@ -15,3 +15,17 @@ it('builds multiple versions of a test file', () => {
   .then(utils.itTests(['src/entry.test.js']))
   .then(utils.itPasses);
 }, 30000);
+
+it('builds chunks ensured by a test file', () => {
+  return utils.run('module-blocks')
+  .then(utils.itBuilt(['src/entry.test.js']))
+  .then(utils.itTests(['src/entry.test.js']))
+  .then(utils.itPasses);
+}, 30000);
+
+it('builds variables in a test file', () => {
+  return utils.run('module-variables')
+  .then(utils.itBuilt(['src/entry.test.js']))
+  .then(utils.itTests(['src/entry.test.js']))
+  .then(utils.itPasses);
+}, 30000);
