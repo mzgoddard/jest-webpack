@@ -74,10 +74,22 @@ const run = async (fixturePath, args = []) => {
   const stdout = concat(child.stdout);
   const stderr = concat(child.stderr);
   const exit = new Promise(resolve => child.on('exit', resolve));
+  // const built = exit
+  // .then(() => walkDir(fullJestWebpackPath, fullJestWebpackPath));
   const built = exit
-  .then(() => walkDir(fullJestWebpackPath, fullJestWebpackPath));
+  .then(() => pify(fs.readFile)(join(fullJestWebpackPath, 'built.json'), 'utf8'))
+  .then(JSON.parse);
 
   return Promise.all([stdout, stderr, exit, built])
+  .catch(err => {
+    console.error(err);
+    return Promise.all([stdout, stderr])
+    .then(([stdout, stderr]) => {
+      console.error(stdout);
+      console.error(stderr);
+      throw err;
+    });
+  })
   .then(([stdout, stderr, exit, built]) => {
     return {
       exit,
