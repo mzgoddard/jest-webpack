@@ -49,11 +49,11 @@ class EntryReferencePlugin {
             return callback(err);
           }
           if (typeof data.source === 'function') {
-            return options.data.compileFile(data.resource, () => {
+            return options.data.compileFile(data.resource.split('?')[0], () => {
               const dep = new EntryReferenceTransformDependency(data.request);
-              dep.userRequest = data.userRequest;
+              // dep.userRequest = data.userRequest;
               dep.module = data;
-              options.data.entries[data.resource].addData(dep);
+              options.data.entries[data.resource.split('?')[0]].addData(dep);
               callback(err, data);
             });
           }
@@ -66,12 +66,12 @@ class EntryReferencePlugin {
             return callback(err, new ExternalModule(data.rawRequest, 'commonjs2'));
           }
 
-          options.data.compileModule(data.request, data.resource, (err, dep) => {
+          options.data.compileModule(data.request, data.resource.split('?')[0], (err, dep) => {
             if (err) {
               return callback(err);
             }
 
-            const shortResource = relative(compilation.compiler.options.context, data.resource);
+            const shortResource = relative(compilation.compiler.options.context, data.resource.split('?')[0]);
             if (compilation.compiler.name === shortResource) {
               callback(null, data);
             }
