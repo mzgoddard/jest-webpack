@@ -1,5 +1,5 @@
 const {readFileSync} = require('fs');
-const {resolve} = require('path');
+const {resolve, sep} = require('path');
 
 const SingleEntryDependency = require('webpack/lib/dependencies/SingleEntryDependency');
 const SingleEntryPlugin = require('webpack/lib/SingleEntryPlugin');
@@ -45,12 +45,15 @@ class TestEntriesPlugin {
     compiler.plugin('make', (compilation, cb) => {
       const {jestArgv, jestConfig} = options;
 
+      const ignoreCacheJestWebpack =
+        '/.cache/jest-webpack/'.replace(/\//g, sep === '\\' ? '\\\\' : sep);
+
       const configIgnoreJestWebpack = Object.assign({}, jestConfig.config, {
         modulePathIgnorePatterns:
           (jestConfig.config.modulePathIgnorePatterns || [])
-          .concat(['/.cache/jest-webpack/']),
+          .concat([ignoreCacheJestWebpack]),
         testPathIgnorePatterns: jestConfig.config.testPathIgnorePatterns
-          .concat(['/.cache/jest-webpack/']),
+          .concat([ignoreCacheJestWebpack]),
       });
 
       try {
