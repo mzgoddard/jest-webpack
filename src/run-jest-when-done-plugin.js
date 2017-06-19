@@ -27,7 +27,10 @@ class RunJestWhenDone {
           process.chdir(oldWd);
           compiler.applyPlugins('jest-webpack-done', result);
         }
-        else {
+        else if (!result.success) {
+          process.on('exit', () => process.exit(1));
+        }
+        else if (jestArgv.forceExit) {
           process.exit(result.success ? 0 : 1);
         }
       });
