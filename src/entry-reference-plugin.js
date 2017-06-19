@@ -1,4 +1,4 @@
-const {dirname, relative} = require('path');
+const {dirname, join, relative} = require('path');
 
 const SingleEntryDependency = require('webpack/lib/dependencies/SingleEntryDependency');
 const ExternalModule = require('webpack/lib/ExternalModule');
@@ -63,7 +63,11 @@ class EntryReferencePlugin {
           }
 
           if (data.loaders.length === 0 && exclude(data.resource)) {
-            return callback(err, new ExternalModule(data.rawRequest, 'commonjs2'));
+            const compilationDir = dirname(compilation.compiler.name);
+            const compilerOutput = compiler.options.output.path;
+            const compilationOutput = join(compilerOutput, compilationDir);
+            const relativeResource = relative(compilationOutput, data.resource);
+            return callback(err, new ExternalModule(relativeResource, 'commonjs2'));
           }
 
           options.data.compileModule(data.request, data.resource.split('?')[0], (err, dep) => {
