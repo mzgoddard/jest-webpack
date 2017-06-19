@@ -24,11 +24,11 @@ const jestArgs = tryRequire(
   () => require('jest-cli/build/cli/args')
 );
 
-function main(config) {
+function main(argv, config) {
   // Ensure JestWebpackPlugin is active
 
   // Echo jest's argv and jest config behaviour
-  const jestArgv = yargs(process.argv.slice(2))
+  const jestArgv = yargs(argv)
     .options(jestArgs.options)
     .check(jestArgs.check).argv;
   const jestConfig = readConfig(jestArgv, config.context);
@@ -41,7 +41,7 @@ function main(config) {
   // }
 
   config.plugins = config.plugins || [];
-  config.plugins.push(new JestWebpackPlugin({jestArgv, jestConfig}));
+  config.plugins.push(new JestWebpackPlugin({argv, jestArgv, jestConfig}));
 
   var compiler = webpack(config);
 

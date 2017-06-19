@@ -35,7 +35,7 @@ class JestWebpackPlugin {
   }
 
   apply(compiler) {
-    const {jestArgv, jestConfig} = this.options;
+    const {argv, jestArgv, jestConfig} = this.options;
 
     compiler.options.entry = {};
     compiler.options.output.path = this.options.path ||
@@ -57,7 +57,7 @@ class JestWebpackPlugin {
     new EntryReferencePlugin({data: shared}).apply(compiler);
     // this.entryPerModule = new EntryPerModulePlugin();
     // this.entryPerModule.apply(compiler);
-    new RunJestWhenDonePlugin().apply(compiler);
+    new RunJestWhenDonePlugin({argv, jestArgv}).apply(compiler);
     new TestEntriesPlugin({data: shared, jestArgv, jestConfig}).apply(compiler);
   }
 }
