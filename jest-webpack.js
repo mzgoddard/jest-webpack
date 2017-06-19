@@ -38,7 +38,7 @@ function run(argv, webpackConfig) {
   main(argv, webpackConfig);
 }
 
-if (process.argv[1] === __filename) {
+if (process.mainModule === module) {
   run(process.argv.slice(2));
 }
 
