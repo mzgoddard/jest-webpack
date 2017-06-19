@@ -50,7 +50,7 @@ class EntryReferencePlugin {
           }
           if (typeof data.source === 'function') {
             return options.data.compileFile(data.resource.split('?')[0], () => {
-              const dep = new EntryReferenceTransformDependency(data.request);
+              const dep = new EntryReferenceTransformDependency('!!' + data.request);
               // dep.userRequest = data.userRequest;
               dep.module = data;
               options.data.entries[data.resource.split('?')[0]].addData(dep);

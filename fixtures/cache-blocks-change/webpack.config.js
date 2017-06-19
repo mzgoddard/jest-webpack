@@ -12,6 +12,6 @@ module.exports = {
   },
   plugins: [
     new HardSourceWebpackPlugin(),
-    new AssetsBuiltPlugin()
+    new AssetsBuiltPlugin(),
   ]
 };

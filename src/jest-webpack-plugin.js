@@ -1,8 +1,10 @@
 const {join} = require('path');
 
 const EmitChangedAssetsPlugin = require('./emit-changed-assets-plugin');
+const EmitPackagePlugin = require('./emit-package-plugin');
 const EntryPerModulePlugin = require('./entry-per-module-plugin');
 const EntryReferencePlugin = require('./entry-reference-plugin');
+const ManifestPlugin = require('./manifest-plugin');
 const RunJestWhenDonePlugin = require('./run-jest-when-done-plugin');
 const SharedData = require('./shared-data');
 const TestEntriesPlugin = require('./test-entries-plugin');
@@ -49,7 +51,9 @@ class JestWebpackPlugin {
 
     const shared = new SharedData();
 
+    new EmitPackagePlugin().apply(compiler);
     new EmitChangedAssetsPlugin().apply(compiler);
+    new ManifestPlugin({data: shared}).apply(compiler);
     new EntryReferencePlugin({data: shared}).apply(compiler);
     // this.entryPerModule = new EntryPerModulePlugin();
     // this.entryPerModule.apply(compiler);
