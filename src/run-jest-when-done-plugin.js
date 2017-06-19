@@ -1,10 +1,6 @@
-const {statSync} = require('fs');
 const {join} = require('path');
-const {spawn} = require('child_process');
 
-const findUp = require('find-up');
-
-const jestExec = require('./jest-exec');
+const jest = require('jest');
 
 class RunJestWhenDone {
   constructor(options = {}) {
@@ -12,6 +8,7 @@ class RunJestWhenDone {
   }
 
   apply(compiler) {
+    const {argv, jestArgv} = this.options;
     // let cliOnce = false;
 
     compiler.plugin('done', function() {
@@ -21,14 +18,17 @@ class RunJestWhenDone {
       // }
       // cliOnce = true;
 
-      const argv = process.argv.slice(2);
+      const wd = join(config.context, '.cache/jest-webpack');
+      const oldWd = process.cwd();
+      process.chdir(wd);
 
-      jestExec(argv, {
-        cwd: join(config.context, '.cache/jest-webpack'),
-      })
-      .then(({code}) => {
-        if (code) {
-          process.exit(code);
+      jest.runCLI(jestArgv, [wd], (result) => {
+        if (compiler._plugins['jest-webpack-done']) {
+          process.chdir(oldWd);
+          compiler.applyPlugins('jest-webpack-done', result);
+        }
+        else {
+          process.exit(result.success ? 0 : 1);
         }
       });
     });
