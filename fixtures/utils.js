@@ -1,6 +1,6 @@
 const fs = require('fs');
 const {dirname, join, relative, sep} = require('path');
-const {spawn} = require('child_process');
+const {fork} = require('child_process');
 
 const findUp = require('find-up');
 const pify = require('pify');
@@ -72,23 +72,112 @@ const clean = async result => {
   return result;
 };
 
+const getWorker = (() => {
+  let isAlive = false;
+  let worker;
+  let stdout = '';
+  let stderr = '';
+  let lastExit = -1;
+  let workerData = {
+    popStdout() {
+      let out = stdout;
+      stdout = '';
+      return out;
+    },
+    popStderr() {
+      let err = stderr;
+      stderr = '';
+      return err;
+    },
+    exitCode() {
+      return lastExit;
+    },
+    run(fixture, args) {
+      return new Promise((resolve, reject) => {
+        worker.send({
+          id: Math.random().toString(16).substring(2),
+          fixture,
+          args,
+        });
+        worker.once('exit', code => {
+          lastExit = code;
+          resolve({success: false});
+        });
+        worker.once('message', result => {
+          lastExit = result.success ? 0 : 1;
+          resolve(result);
+        });
+      });
+    },
+  };
+  () => require('./worker?__jest_webpack_isEntry');
+  () => require('./worker.babel?__jest_webpack_isEntry');
+
+  return () => {
+    try {
+      if (!isAlive) {
+        try {
+          worker = fork(join(__dirname, 'worker.babel.js'), {
+            stdio: ['pipe', 'pipe', 'pipe', 'ipc'],
+            // stdio: ['inherit', 'inherit', 'inherit', 'ipc'],
+          });
+          worker.stdout.on('data', data => {
+            stdout += data.toString();
+          });
+        }
+        catch (_) {
+          // Node 4 API
+          worker = fork(join(__dirname, 'worker.babel.js'), {
+            silent: true,
+            // stdio: ['inherit', 'inherit', 'inherit', 'ipc'],
+          });
+          worker.stdout.on('data', data => {
+            stdout += data.toString();
+          });
+        }
+        worker.stderr.on('data', data => {
+          stderr += data.toString();
+        });
+        worker.on('exit', () => {
+          isAlive = false;
+        });
+        isAlive = true;
+      }
+      return workerData;
+    }
+    catch (err) {
+      console.error(err.stack || err);
+      throw err;
+    }
+  };
+})();
+
 const _runJest = result => {
   const {fixture, args} = result;
   const {jestWebpackBin, fullFixturePath, fullJestWebpackPath} =
     _findPaths(fixture);
 
-  const child = spawn(process.argv[0], [
-    jestWebpackBin,
-  ].concat(args), {
-    cwd: fullFixturePath,
-    stdio: 'pipe',
-  });
+  // const child = spawn(process.argv[0], [
+  //   jestWebpackBin,
+  // ].concat(args), {
+  //   cwd: fullFixturePath,
+  //   stdio: 'pipe',
+  // });
+  //
+  // const stdout = concat(child.stdout);
+  // const stderr = concat(child.stderr);
+  // const exit = new Promise(resolve => child.on('exit', resolve));
+  // // const built = exit
+  // // .then(() => walkDir(fullJestWebpackPath, fullJestWebpackPath));
 
-  const stdout = concat(child.stdout);
-  const stderr = concat(child.stderr);
-  const exit = new Promise(resolve => child.on('exit', resolve));
-  // const built = exit
-  // .then(() => walkDir(fullJestWebpackPath, fullJestWebpackPath));
+  // console.log('_runJest');
+
+  const worker = getWorker();
+  const job = worker.run(fixture, args);
+  const stdout = job.then(() => worker.popStdout());
+  const stderr = job.then(() => worker.popStderr());
+  const exit = job.then(() => worker.exitCode());
+
   const built = exit
   .then(() => pify(fs.readFile)(join(fullJestWebpackPath, 'built.json'), 'utf8'))
   .then(JSON.parse);
