@@ -224,7 +224,8 @@ class SharedData {
       ) ||
       isEntry &&
       this.manifest &&
-      this.manifest[resource]
+      this.manifest[resource] &&
+      this.manifest[resource].transforms.find(transform => transform.isEntry)
     ) {
       this.fulfilledManifest[resource] = this.fulfilledManifest[resource] || {
         transforms: [],
@@ -257,7 +258,7 @@ class SharedData {
         .dependencies.forEach(dep => {
           const depSplit = dep.split('!');
           const resource = depSplit[depSplit.length - 1];
-          this.compileModule(dep, resource.split('?')[0], () => {});
+          this.compileModule(dep, resource.split('?')[0], () => {}, resource.split('?')[1] === '__jest_webpack_isEntry');
         });
       }
       return callback(null, {
