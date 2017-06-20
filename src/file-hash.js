@@ -1,4 +1,4 @@
-const {join} = require('path');
+const {basename, join} = require('path');
 const {readdir, readFile, stat} = require('fs');
 
 const pify = require('pify');
@@ -24,14 +24,17 @@ const contextHash = (dir, _contextHash = contextHash) => {
       });
     }));
   })
+  .then(hashes => hashes.filter(Boolean))
   .then(hashes => hashes.reduce((carry, value) => hash(carry + value)));
 };
 
 const depsContextHash = dir => {
   return contextHash(dir, dir => (
-    pify(stat)(join(dir, 'package.json'))
-    .then(() => fileHash(join(dir, 'package.json')))
-    .catch(() => contextHash(dir, dir => hash(dir)))
+    basename(dir).startsWith('.') ?
+      null :
+      pify(stat)(join(dir, 'package.json'))
+      .then(() => fileHash(join(dir, 'package.json')))
+      .catch(() => contextHash(dir, dir => hash(dir)))
   ));
 };
 

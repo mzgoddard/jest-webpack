@@ -24,6 +24,9 @@ class ManifestPlugin {
 
     const manifestPath = join(compiler.options.context, '.cache/jest-webpack/manifest.json');
     const depsDirs = [join(compiler.options.context, 'node_modules')];
+    const depsHash = Promise.all(depsDirs.map(depsContextHash))
+    .catch(() => [''])
+    .then(hashes => hashes.reduce((carry, value) => hash(carry + value)));
 
     compiler.plugin(['watch-run', 'run'], (compiler, cb) => {
       const inputFileSystem = compiler.inputFileSystem;
@@ -32,8 +35,6 @@ class ManifestPlugin {
       .then(file => file.toString())
       .catch(() => '{}')
       .then(JSON.parse);
-      const depsHash = Promise.all(depsDirs.map(depsContextHash))
-      .then(hashes => hashes.reduce((carry, value) => hash(carry + value)));
       Promise.all([manifest, depsHash])
       .then(([manifest, depsHash]) => {
         return Promise.all(
@@ -156,9 +157,7 @@ class ManifestPlugin {
             };
           });
         }))
-        .then(() => (
-          depsContextHash(join(compiler.options.context, 'node_modules'))
-        ))
+        .then(() => depsHash)
         .then(depsHash => {
           manifest.__configHash = _configHash;
           manifest.__depsHash = depsHash;
