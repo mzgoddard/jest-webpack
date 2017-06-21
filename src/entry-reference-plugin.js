@@ -82,7 +82,7 @@ class EntryReferencePlugin {
             else {
               callback(null, new ReferenceEntryModule(data, dep));
             }
-          });
+          }, data.resource.split('?')[1] === '__jest_webpack_isEntry');
         });
       });
 
