@@ -9,13 +9,13 @@ Add it to your project as a developer dependency. And run it like `webpack` or `
 #### Install
 
 ```sh
-npm install --save-dev @mzgoddard/jest-webpack
+npm install --save-dev jest-webpack
 ```
 
 or with `yarn`
 
 ```sh
-yarn add -D @mzgoddard/jest-webpack
+yarn add -D jest-webpack
 ```
 
 #### Update package.json
@@ -43,7 +43,7 @@ npm test -- --testPathPattern test-just-this-file
 
 ## Status
 
-`@mzgoddard/jest-webpack` currently works with a lot of jest options out of the bag since there is no special handling needed and they can just be passed to jest by the tool. You can see what is so far specifically tested so far in https://github.com/mzgoddard/jest-webpack/issues/3.
+`jest-webpack` currently works with a lot of jest options out of the bag since there is no special handling needed and they can just be passed to jest by the tool. You can see what is so far specifically tested so far in https://github.com/mzgoddard/jest-webpack/issues/3.
 
 ## How it works?
 
@@ -55,3 +55,7 @@ npm test -- --testPathPattern test-just-this-file
 4. The `RunJestWhenDonePlugin` runs jest when webpack is done. It runs jest from the destination folder so jest uses the webpack transformed files. This lets jest determine what files changed and which runs to test again instead of testing all the files again.
 
 This way of integrating jest and webpack is fairly transparent, requiring little modification to a webpack project. Used along with `source-map-support`, you can also get source maps.
+
+## Special Thanks
+
+Thanks to [Colch](https://github.com/ColCh) for letting me take over development of a jest-webpack integration as the jest-webpack npm package.
