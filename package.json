@@ -1,5 +1,5 @@
 {
-  "name": "@mzgoddard/jest-webpack",
+  "name": "jest-webpack",
   "version": "0.0.12",
   "description": "Use webpack loader and plugins you want to build modules into individual files and test them with jest.",
   "repository": {
@@ -21,7 +21,10 @@
     "plugin",
     "webpack plugin"
   ],
-  "author": "Michael \"Z\" Goddard <mzgoddard@gmail.com>",
+  "author": {
+    "name": "Michael \"Z\" Goddard",
+    "email": "<mzgoddard@gmail.com>"
+  },
   "license": "ISC",
   "devDependencies": {
     "babel": "^6.23.0",
