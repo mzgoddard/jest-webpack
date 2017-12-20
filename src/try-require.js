@@ -2,7 +2,8 @@ module.exports = (...attempts) => {
   let err;
   for (const fn of attempts) {
     try {
-      return fn();
+      const exports = fn();
+      return exports.default || exports;
     }
     catch (_) {err = _;}
   }

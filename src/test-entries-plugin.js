@@ -12,11 +12,15 @@ const NodeTemplatePlugin = require('webpack/lib/node/NodeTemplatePlugin');
 // test files jest will test once the webpack step is complete.
 const tryRequire = require('./try-require');
 const SearchSource = tryRequire(
+  () => require('jest/node_modules/jest-cli/build/search_source'),
   () => require('jest/node_modules/jest-cli/build/SearchSource'),
+  () => require('jest-cli/build/search_source'),
   () => require('jest-cli/build/SearchSource')
 );
 const createContext = tryRequire(
+  () => require('jest/node_modules/jest-cli/build/lib/create_context'),
   () => require('jest/node_modules/jest-cli/build/lib/createContext'),
+  () => require('jest-cli/build/lib/create_context'),
   () => require('jest-cli/build/lib/createContext')
 );
 const Runtime = tryRequire(
@@ -24,10 +28,41 @@ const Runtime = tryRequire(
   () => require('jest-cli/node_modules/jest-runtime'),
   () => require('jest-runtime')
 );
-const getTestPathPattern = tryRequire(
-  () => require('jest/node_modules/jest-cli/build/lib/getTestPathPattern'),
-  () => require('jest-cli/build/lib/getTestPathPattern')
-);
+// const getTestPathPattern = tryRequire(
+//   () => require('jest/node_modules/jest-cli/build/lib/getTestPathPattern'),
+//   () => require('jest-cli/build/lib/getTestPathPattern')
+// );
+
+const modulePathIgnorePatterns = function(options) {
+  if (options.jestConfig.config) {
+    return options.jestConfig.config.modulePathIgnorePatterns;
+  }
+  else {
+    return options.jestConfig.projectConfig.modulePathIgnorePatterns;
+  }
+};
+
+const testPathIgnorePatterns = function(options) {
+  if (options.jestConfig.config) {
+    return options.jestConfig.config.testPathIgnorePatterns;
+  }
+  else {
+    return options.jestConfig.projectConfig.testPathIgnorePatterns;
+  }
+};
+
+const testPathPattern = function(options) {
+  if (options.jestConfig.config) {
+    const getTestPathPattern = tryRequire(
+      () => require('jest/node_modules/jest-cli/build/lib/getTestPathPattern'),
+      () => require('jest-cli/build/lib/getTestPathPattern')
+    );
+    return getTestPathPattern(options.jestArgv);
+  }
+  else {
+    return options.jestConfig.globalConfig.testPathPattern;
+  }
+};
 
 class TestEntriesPlugin {
   constructor(options) {
@@ -49,13 +84,17 @@ class TestEntriesPlugin {
       const ignoreCacheJestWebpack =
         '/.cache/jest-webpack/'.replace(/\//g, sep === '\\' ? '\\\\' : sep);
 
-      const configIgnoreJestWebpack = Object.assign({}, jestConfig.config, {
-        modulePathIgnorePatterns:
-          (jestConfig.config.modulePathIgnorePatterns || [])
-          .concat([ignoreCacheJestWebpack]),
-        testPathIgnorePatterns: jestConfig.config.testPathIgnorePatterns
-          .concat([ignoreCacheJestWebpack]),
-      });
+      const configIgnoreJestWebpack = Object.assign(
+        {},
+        jestConfig.projectConfig || jestConfig.config,
+        {
+          modulePathIgnorePatterns:
+            (modulePathIgnorePatterns(options) || [])
+            .concat([ignoreCacheJestWebpack]),
+          testPathIgnorePatterns: (testPathIgnorePatterns(options) || [])
+            .concat([ignoreCacheJestWebpack]),
+        }
+      );
 
       try {
         mkdirp.sync(configIgnoreJestWebpack.cacheDirectory);
@@ -66,8 +105,7 @@ class TestEntriesPlugin {
       .then(hasteMap => createContext(configIgnoreJestWebpack, hasteMap))
       .then(jestContext => {
         const searchSource = new SearchSource(jestContext);
-        const testPathPattern = getTestPathPattern(jestArgv);
-        return searchSource.findMatchingTests(testPathPattern)
+        return searchSource.findMatchingTests(testPathPattern(options))
         .tests.map(test => test.path);
       })
       .then(tests => {

@@ -28,9 +28,9 @@ function main(argv, config) {
   // Ensure JestWebpackPlugin is active
 
   // Echo jest's argv and jest config behaviour
-  const jestArgv = yargs(argv)
+  const jestArgv = yargs([])
     .options(jestArgs.options)
-    .check(jestArgs.check).argv;
+    .check(jestArgs.check).parse(argv);
   const jestConfig = readConfig(jestArgv, config.context);
 
   // var coverageMode = process.argv
@@ -60,7 +60,7 @@ function main(argv, config) {
 
 // let once = true;
 if (process.argv[1] === __filename) {
-  main(eval('require')(join(process.cwd(), 'webpack.config.js')));
+  main(process.argv.slice(2), eval('require')(join(process.cwd(), 'webpack.config.js')));
 }
 
 module.exports = main;
