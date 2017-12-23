@@ -10,6 +10,11 @@
   "bin": {
     "jest-webpack": "./jest-webpack.js"
   },
+  "files": [
+    "src",
+    "webpack-1",
+    "jest-webpack.js"
+  ],
   "scripts": {
     "build": "webpack",
     "test": "node ./jest-webpack.js --runInBand",
