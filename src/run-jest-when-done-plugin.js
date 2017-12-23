@@ -22,18 +22,53 @@ class RunJestWhenDone {
       const oldWd = process.cwd();
       process.chdir(wd);
 
-      jest.runCLI(jestArgv, [wd], (result) => {
+      const jestDone = result => {
         if (compiler._plugins['jest-webpack-done']) {
-          process.chdir(oldWd);
-          compiler.applyPlugins('jest-webpack-done', result);
+          try {
+            process.chdir(oldWd);
+          }
+          finally {
+            compiler.applyPlugins('jest-webpack-done', result);
+          }
+          return true;
         }
-        else if (!result.success) {
-          process.on('exit', () => process.exit(1));
-        }
-        else if (jestArgv.forceExit) {
-          process.exit(result.success ? 0 : 1);
-        }
-      });
+      };
+
+      const run = () => {
+        return new Promise((resolve, reject) => {
+          const promise = jest.runCLI(jestArgv, [wd], (e, result) => {
+            if (e) {return reject(e);}
+            return resolve(result);
+          });
+          if (promise) {
+            promise.then(resolve, reject);
+          }
+        });
+      };
+
+      try {
+        run()
+        .then((result) => {
+          if (!jestDone(result.results)) {
+            if (!result.results.success) {
+              process.on('exit', () => process.exit(1));
+            }
+            else if (jestArgv.forceExit) {
+              process.exit(result.results.success ? 0 : 1);
+            }
+          }
+        })
+        .catch(function(e) {
+          console.error(e.stack || e);
+          jestDone({success: false});
+          process.exit(1);
+        });
+      }
+      catch (e) {
+        console.error(e.stack || e);
+        jestDone({success: false});
+        process.exit(1);
+      }
     });
   }
 }

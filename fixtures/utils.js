@@ -94,19 +94,23 @@ const getWorker = (() => {
     },
     run(fixture, args) {
       return new Promise((resolve, reject) => {
+        const onExit = code => {
+          lastExit = code;
+          resolve({success: false});
+          worker.removeListener('message', onMessage);
+        };
+        const onMessage = result => {
+          lastExit = result.success ? 0 : 1;
+          resolve(result);
+          worker.removeListener('exit', onExit);
+        };
         worker.send({
           id: Math.random().toString(16).substring(2),
           fixture,
           args,
         });
-        worker.once('exit', code => {
-          lastExit = code;
-          resolve({success: false});
-        });
-        worker.once('message', result => {
-          lastExit = result.success ? 0 : 1;
-          resolve(result);
-        });
+        worker.once('exit', onExit);
+        worker.once('message', onMessage);
       });
     },
   };
@@ -184,7 +188,7 @@ const _runJest = result => {
 
   return Promise.all([stdout, stderr, exit, built])
   .catch(err => {
-    console.error(err);
+    console.error(err.stack || err);
     return Promise.all([stdout, stderr])
     .then(([stdout, stderr]) => {
       console.error(stdout);

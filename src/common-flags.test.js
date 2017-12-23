@@ -24,7 +24,7 @@ it('--testNamePattern', () => {
 
 it('--testPathPattern', () => {
   return run('flags-testPathPattern', ['--testPathPattern', 'entry1.test'])
-  .then(itBuilt(['src/entry1.test.js', 'src/entry2.test.js']))
+  .then(didNotBuild(['src/entry2.test.js']))
   .then(itTests(['entry1']))
   .then(itSkips(['entry2']))
   .then(itPasses);

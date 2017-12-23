@@ -10,6 +10,11 @@
   "bin": {
     "jest-webpack": "./jest-webpack.js"
   },
+  "files": [
+    "src",
+    "webpack-1",
+    "jest-webpack.js"
+  ],
   "scripts": {
     "build": "webpack",
     "test": "node ./jest-webpack.js --runInBand",
@@ -34,13 +39,13 @@
     "babel-preset-jest": "^20.0.3",
     "css-loader": "^0.28.4",
     "file-loader": "^0.11.2",
-    "hard-source-webpack-plugin": "^0.4.4",
-    "jest": "^20.0.4",
+    "hard-source-webpack-plugin": "^0.5.0",
+    "jest": "^21.0.0 || ^20.0.4",
     "raw-loader": "^0.5.1",
     "rimraf": "^2.6.1",
     "source-map-support": "^0.4.15",
     "style-loader": "^0.18.2",
-    "webpack": "^2.1.0 || ^1.13.0",
+    "webpack": "^3.0.0 || ^2.1.0 || ^1.13.0",
     "webpack-if": "^0.1.2"
   },
   "peerDependencies": {
@@ -52,6 +57,7 @@
   },
   "dependencies": {
     "find-up": "^2.1.0",
+    "mkdirp": "^0.5.1",
     "node-object-hash": "^1.2.0",
     "pify": "^3.0.0",
     "regenerator-runtime": "^0.10.5",
