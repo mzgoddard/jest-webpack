@@ -1,5 +1,6 @@
 const {readFileSync} = require('fs');
 const {resolve, sep} = require('path');
+const mkdirp = require('mkdirp');
 
 const SingleEntryDependency = require('webpack/lib/dependencies/SingleEntryDependency');
 const SingleEntryPlugin = require('webpack/lib/SingleEntryPlugin');
@@ -57,7 +58,7 @@ class TestEntriesPlugin {
       });
 
       try {
-        require('fs').mkdirSync(configIgnoreJestWebpack.cacheDirectory);
+        mkdirp.sync(configIgnoreJestWebpack.cacheDirectory);
       }
       catch (_) {}
 

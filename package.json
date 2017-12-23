@@ -52,6 +52,7 @@
   },
   "dependencies": {
     "find-up": "^2.1.0",
+    "mkdirp": "^0.5.1",
     "node-object-hash": "^1.2.0",
     "pify": "^3.0.0",
     "regenerator-runtime": "^0.10.5",
