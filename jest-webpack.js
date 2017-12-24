@@ -29,7 +29,8 @@ function run(argv, webpackConfig) {
   }
 
   if (typeof webpackConfig.then === 'function') {
-    webpackConfig.then(function(config) {run(argv, config);}, function(err) {
+    webpackConfig.then(function(config) {run(argv, config);})
+    .catch(function(err) {
       console.error(err.stack || err);
       process.exit();
     });
