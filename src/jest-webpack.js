@@ -58,10 +58,20 @@ function main(argv, config) {
   const watchMode = false;
 
   if (watchMode) {
-    compiler.watch({}, function() {});
+    compiler.watch({}, function(err) {
+      if (err) {
+        console.error(err.stack || err);
+        process.exit();
+      }
+    });
   }
   else {
-    compiler.run(function() {});
+    compiler.run(function(err) {
+      if (err) {
+        console.error(err.stack || err);
+        process.exit();
+      }
+    });
   }
 }
 
