@@ -17,7 +17,7 @@
   ],
   "scripts": {
     "build": "webpack",
-    "test": "node ./jest-webpack.js --runInBand",
+    "test": "node ./jest-webpack.js --maxWorkers 1",
     "prepublishOnly": "NODE_ENV=production npm run build && npm test"
   },
   "keywords": [
