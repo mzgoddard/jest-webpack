@@ -16,9 +16,9 @@ const {readConfig} = tryRequire(
   () => require('jest-config')
 );
 const jestYargs = tryRequire(
-  () => require('jest/node_modules/jest-cli/node_modules/yargs'),
-  () => require('jest-cli/node_modules/yargs'),
-  () => require('yargs')
+  () => require('jest/node_modules/jest-cli/node_modules/yargs/yargs'),
+  () => require('jest-cli/node_modules/yargs/yargs'),
+  () => require('yargs/yargs')
 );
 const jestArgs = tryRequire(
   () => require('jest/node_modules/jest-cli/build/cli/args'),
@@ -33,9 +33,15 @@ function main(argv, config) {
   }));
 
   // Echo jest's argv and jest config behaviour
-  const jestArgv = jestYargs([])
+  const jestArgv = jestYargs(argv.slice())
+    .usage(jestArgs.usage)
+    .alias('help', 'h')
     .options(jestArgs.options)
-    .check(jestArgs.check).parse(argv);
+    .epilogue(jestArgs.docs)
+    .check(jestArgs.check)
+    .version(false)
+    .parse(argv.slice());
+
   const jestConfig = readConfig(jestArgv, packageRoot);
 
   // var coverageMode = process.argv
