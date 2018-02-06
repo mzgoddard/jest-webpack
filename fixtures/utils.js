@@ -251,13 +251,26 @@ const didNotBuild = (files) => result => {
   return result;
 };
 
+const containsOutput = (out) => result => {
+  expect(result.stderr).toContain(out);
+  return result;
+};
+
+const missesOutput = (out) => result => {
+  expect(result.stderr).not.toContain(out);
+  return result;
+};
+
 const itTests = (files) => result => {
   files.forEach(file => expect(result.stderr).toMatch(file.replace(/\//g, sep)));
   return result;
 };
 
 const itSkips = (files) => result => {
-  files.forEach(file => expect(result.stderr).not.toMatch(file.replace(/\//g, sep)));
+  files.forEach(file => (
+    expect(result.stderr)
+    .not.toMatch(file.replace(/\//g, sep))
+  ));
   return result;
 };
 
@@ -271,6 +284,8 @@ module.exports = {
   itFails,
   itBuilt,
   didNotBuild,
+  containsOutput,
+  missesOutput,
   itTests,
   itSkips,
 };
