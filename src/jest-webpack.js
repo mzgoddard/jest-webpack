@@ -1,6 +1,7 @@
 const fs = require('fs');
-const {join} = require('path');
+const {join, dirname} = require('path');
 
+const findUp = require('find-up');
 const webpack = require('webpack');
 
 const JestWebpackPlugin = require('./jest-webpack-plugin');
@@ -14,7 +15,7 @@ const {readConfig} = tryRequire(
   () => require('jest-cli/node_modules/jest-config'),
   () => require('jest-config')
 );
-const yargs = tryRequire(
+const jestYargs = tryRequire(
   () => require('jest/node_modules/jest-cli/node_modules/yargs'),
   () => require('jest-cli/node_modules/yargs'),
   () => require('yargs')
@@ -27,11 +28,15 @@ const jestArgs = tryRequire(
 function main(argv, config) {
   // Ensure JestWebpackPlugin is active
 
+  const packageRoot = dirname(findUp.sync('package.json', {
+    cwd: config.context,
+  }));
+
   // Echo jest's argv and jest config behaviour
-  const jestArgv = yargs([])
+  const jestArgv = jestYargs([])
     .options(jestArgs.options)
     .check(jestArgs.check).parse(argv);
-  const jestConfig = readConfig(jestArgv, config.context);
+  const jestConfig = readConfig(jestArgv, packageRoot);
 
   // var coverageMode = process.argv
   // .reduce(function(carry, opt) {return carry || /^--coverage$/.test(opt);}, false);
@@ -40,7 +45,9 @@ function main(argv, config) {
   //   config.babel.plugins = (config.babel.plugins || []).concat('istanbul');
   // }
 
-  config.plugins = config.plugins || [];
+  config = Object.assign({}, config, {
+    plugins: config.plugins || []
+  });
   config.plugins.push(new JestWebpackPlugin({argv, jestArgv, jestConfig}));
 
   var compiler = webpack(config);
@@ -51,10 +58,20 @@ function main(argv, config) {
   const watchMode = false;
 
   if (watchMode) {
-    compiler.watch({}, function() {});
+    compiler.watch({}, function(err) {
+      if (err) {
+        console.error(err.stack || err);
+        process.exit();
+      }
+    });
   }
   else {
-    compiler.run(function() {});
+    compiler.run(function(err) {
+      if (err) {
+        console.error(err.stack || err);
+        process.exit();
+      }
+    });
   }
 }
 

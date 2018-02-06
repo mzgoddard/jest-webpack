@@ -17,7 +17,7 @@
   ],
   "scripts": {
     "build": "webpack",
-    "test": "node ./jest-webpack.js --runInBand",
+    "test": "node ./jest-webpack.js --maxWorkers 1",
     "prepublishOnly": "NODE_ENV=production npm run build && npm test"
   },
   "keywords": [
@@ -37,6 +37,7 @@
     "babel-loader": "^7.0.0 || ^6.0.0",
     "babel-preset-env": "^1.5.1",
     "babel-preset-jest": "^20.0.3",
+    "babel-register": "^6.26.0",
     "css-loader": "^0.28.4",
     "file-loader": "^0.11.2",
     "hard-source-webpack-plugin": "^0.5.0",
@@ -45,15 +46,12 @@
     "rimraf": "^2.6.1",
     "source-map-support": "^0.4.15",
     "style-loader": "^0.18.2",
-    "webpack": "^3.0.0 || ^2.1.0 || ^1.13.0",
+    "webpack": "^3.0.0 || ^2.1.0",
     "webpack-if": "^0.1.2"
   },
   "peerDependencies": {
-    "jest": "*",
-    "webpack": "*"
-  },
-  "optionalDependencies": {
-    "babel-register": "*"
+    "jest": ">=20.0.0",
+    "webpack": ">=2.0.0"
   },
   "dependencies": {
     "find-up": "^2.1.0",
@@ -61,7 +59,8 @@
     "node-object-hash": "^1.2.0",
     "pify": "^3.0.0",
     "regenerator-runtime": "^0.10.5",
-    "webpack-sources": "^1.0.1"
+    "webpack-sources": "^1.0.1",
+    "yargs": "^10.0.3"
   },
   "jest": {
     "testPathIgnorePatterns": [
