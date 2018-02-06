@@ -1,9 +1,9 @@
-const {run, itBuilt, itSkips, itPasses, itFails} = require('../fixtures/utils');
+const {run, itBuilt, itSkips, containsOutput, itPasses, itFails} = require('../fixtures/utils');
 
 it('bail', () => {
   return run('config-bail')
   .then(itBuilt(['src/entry.test.js']))
-  .then(itSkips(['passes']))
+  .then(containsOutput(' failed, '))
   .then(itFails);
 }, 30000);
 
