@@ -20,7 +20,7 @@ function run(argv, webpackConfig) {
   }
 
   if (!webpackConfig) {
-    var webpackYargs = require('yargs')([]);
+    var webpackYargs = require('yargs/yargs')([]);
     require('webpack/bin/config-yargs')(webpackYargs);
     var webpackArgv = webpackYargs.parse(webpackArgvPortion);
     webpackConfig = require('webpack/bin/convert-argv')(
@@ -61,9 +61,10 @@ function run(argv, webpackConfig) {
 }
 
 if (process.mainModule === module) {
-  const jestWebpackYargs = require('yargs')(process.argv)
-    .usage(`${versionInfo()}\nUsage: jest-webpack [jest options] [--[webpack] [webpack options]]`);
-  jestWebpackYargs.parse();
+  const jestWebpackYargs = require('yargs/yargs')(process.argv)
+    .reset()
+    .usage(`${versionInfo()}\n\nUsage: jest-webpack [jest options] [--[webpack] [webpack options]]`);
+  jestWebpackYargs.version(false).parse();
 
   run(process.argv.slice(2));
 }

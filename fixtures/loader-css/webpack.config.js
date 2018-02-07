@@ -29,7 +29,7 @@ module.exports = webpackIf({
     ]),
   },
   plugins: [
-    new HardSourceWebpackPlugin(),
+    // new HardSourceWebpackPlugin(),
     new AssetsBuiltPlugin()
   ]
 });

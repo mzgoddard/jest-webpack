@@ -29,11 +29,14 @@ module.exports = webpackIf({
     path: join(__dirname, 'webpack-1'),
     filename: '[name].js',
     libraryTarget: 'commonjs2',
+    // devtoolModuleFilenameTemplate sets the stored path in the source maps
+    // sources array. jest will use this to read the original file.
+    devtoolModuleFilenameTemplate: join(__dirname, '[resource-path]'),
   },
 
-  // devtool: Enable for source maps. Cheap means only line data. Module means
-  // lines of the loader output, in this case the es5 output from babel.
-  devtool: 'cheap-source-map',
+  // devtool: Enable for source maps. Module means lines of the loader output,
+  // in this case the es5 output from babel.
+  devtool: 'module-source-map',
 
   externals: function(context, request, callback) {
     if (request.indexOf('!') === -1 && /^\w/.test(request)) {

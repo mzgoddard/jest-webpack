@@ -11,7 +11,7 @@ module.exports = {
     filename: '[name].js'
   },
   plugins: [
-    new HardSourceWebpackPlugin(),
+    // new HardSourceWebpackPlugin(),
     new AssetsBuiltPlugin()
   ]
 };
