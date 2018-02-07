@@ -1,6 +1,6 @@
 {
   "name": "jest-webpack",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "description": "Use webpack loader and plugins you want to build modules into individual files and test them with jest.",
   "repository": {
     "type": "git",
