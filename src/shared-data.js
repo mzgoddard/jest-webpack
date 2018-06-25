@@ -73,14 +73,23 @@ class SharedData {
       for (const key in this.fulfilledManifest) {
         const item = this.fulfilledManifest[key];
         const oldItem = this.manifest[key];
+        // item && item.transforms.sort();
+        // oldItem && oldItem.transforms.sort();
         if (
           item && oldItem &&
           item.transforms.length < oldItem.transforms.length
+          // (
+          //   item.transforms.length !== oldItem.transforms.length ||
+          //   oldItem.transforms.some(t => !item.transforms.find(_t => (
+          //     _t.request === t.request &&
+          //     _t.isEntry === t.isEntry
+          //   )))
+          // )
         ) {
           // console.log('smaller file', key, item.transforms.length, oldItem.transforms.length);
           this.manifest[key] = null;
-          for (const index in item.transforms) {
-            this.compileModule(item.transforms[index], key, () => {});
+          for (const index in oldItem.transforms) {
+            // this.compileModule(oldItem.transforms[index], key, () => {});
           }
         }
       }
@@ -213,46 +222,55 @@ class SharedData {
 
   compileModule(request, resource, callback, isEntry = false) {
     if (
-      !isEntry &&
+      // !isEntry &&
       this.manifest &&
       this.manifest[resource] &&
       (
         this.manifest[resource].transforms
-        .findIndex(transform => transform.request === request) !== -1 ||
-        this.manifest[resource].transforms
-        .findIndex(transform => transform.rawRequest === '!!' + request) !== -1
-      ) ||
-      isEntry &&
-      this.manifest &&
-      this.manifest[resource] &&
-      this.manifest[resource].transforms.find(transform => transform.isEntry)
+        .findIndex(transform => (
+          transform.request === request && transform.isEntry === isEntry
+        )) !== -1
+        // this.manifest[resource].transforms
+        // .findIndex(transform => transform.rawRequest === '!!' + request) !== -1
+      )
+      //  ||
+      // isEntry &&
+      // this.manifest &&
+      // this.manifest[resource] &&
+      // this.manifest[resource].transforms.find(transform => transform.isEntry)
     ) {
       this.fulfilledManifest[resource] = this.fulfilledManifest[resource] || {
         transforms: [],
       };
-      if (isEntry) {
-        request = this.manifest[resource].transforms
-        .find(transform => transform.isEntry)
-        .request;
-      }
-      else {
-        request = (
-          this.manifest[resource].transforms
-          .find(transform => transform.request === request) ||
-          this.manifest[resource].transforms
-          .find(transform => transform.rawRequest === '!!' + request)
-        ).request;
-      }
-      if (
-        this.fulfilledManifest[resource].transforms
-        .findIndex(transform => transform.request === request) === -1
-      ) {
+      this.fulfilledManifest[resource].transforms.push({
+        request,
+        resource,
+        isEntry,
+      });
+
+      // if (isEntry) {
+      //   request = this.manifest[resource].transforms
+      //   .find(transform => transform.isEntry)
+      //   .request;
+      // }
+      // else {
+      //   request = (
+      //     this.manifest[resource].transforms
+      //     .find(transform => transform.request === request)
+      //     // this.manifest[resource].transforms
+      //     // .find(transform => transform.rawRequest === '!!' + request)
+      //   ).request;
+      // }
+      // if (
+      //   this.fulfilledManifest[resource].transforms
+      //   .findIndex(transform => transform.request === request) === -1
+      // ) {
         // console.log('stand deps',
         //   this.manifest[resource].transforms
         //   .findIndex(transform => transform.request === request),
         //   resource, request);
 
-        this.fulfilledManifest[resource].transforms.push(request);
+        // this.fulfilledManifest[resource].transforms.push(request);
         this.manifest[resource].transforms
         .find(transform => transform.request === request)
         .dependencies.forEach(dep => {
@@ -260,14 +278,21 @@ class SharedData {
           const resource = depSplit[depSplit.length - 1];
           this.compileModule(dep, resource.split('?')[0], () => {}, resource.split('?')[1] === '__jest_webpack_isEntry');
         });
-      }
+      // }
       return callback(null, {
         request: request,
       });
     }
     if (this.manifest && this.manifest[resource]) {
-      // console.log(this.manifest[resource].transforms);
       this.manifest[resource] = null;
+
+      if (this.fulfilledManifest && this.fulfilledManifest[resource]) {
+        this.fulfilledManifest[resource].transforms
+        .forEach(({request, resource, isEntry}) => {
+          this.compileModule(request, resource, () => {}, isEntry);
+        });
+        this.fulfilledManifest[resource] = null;
+      }
     }
 
     // console.log('not cached', resource, request);

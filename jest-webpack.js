@@ -6,6 +6,20 @@ function versionInfo() {
   `webpack ${require('webpack/package.json').version}`;
 }
 
+function tryRequire(attempts) {
+  attempts = Array.from(arguments);
+  var err;
+  for (var i = 0; i < attempts.length; i++) {
+    var fn = attempts[i];
+    try {
+      var exports = fn();
+      return exports.default || exports;
+    }
+    catch (_) {err = _;}
+  }
+  throw err;
+}
+
 function run(argv, webpackConfig) {
   var jestArgvPortion, webpackArgvPortion;
   var webpackArgIndex =
@@ -21,9 +35,15 @@ function run(argv, webpackConfig) {
 
   if (!webpackConfig) {
     var webpackYargs = require('yargs/yargs')([]);
-    require('webpack/bin/config-yargs')(webpackYargs);
+    tryRequire(
+      function() {return require('webpack/bin/config-yargs');},
+      function() {return require('webpack-cli/bin/config-yargs');}
+    )(webpackYargs);
     var webpackArgv = webpackYargs.parse(webpackArgvPortion);
-    webpackConfig = require('webpack/bin/convert-argv')(
+    webpackConfig = tryRequire(
+      function() {return require('webpack/bin/convert-argv');},
+      function() {return require('webpack-cli/bin/convert-argv');}
+    )(
       webpackYargs, webpackArgv
     );
   }

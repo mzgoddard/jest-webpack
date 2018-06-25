@@ -8,7 +8,7 @@ const hash = require('./hash');
 
 class ReferenceEntryModule extends Module {
   constructor(data, dep) {
-    super();
+    super('javascript/auto');
     this.data = data;
     this.dep = dep;
     this.context = data.context;
@@ -36,6 +36,16 @@ class ReferenceEntryModule extends Module {
 
   build(options, compilation, resolver, fs, callback) {
     this.built = true;
+    this.buildMeta = {
+      providedExports: []
+    };
+    this.buildInfo = {
+      cacheable: false,
+      assets: [],
+      dependencies: this.dependencies,
+      fileDependencies: new Set,
+      contextDependencies: new Set
+    };
     callback();
   }
 

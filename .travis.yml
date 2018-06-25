@@ -4,15 +4,13 @@ matrix:
   fast_finish: true
   include:
     - node_js: node
-      env: WEBPACK_VERSION=3 BABEL_LOADER=7
+      env: WEBPACK_VERSION=4 BABEL_LOADER=7 JEST_VERSION=23
     - node_js: 8
-      env: WEBPACK_VERSION=3 BABEL_LOADER=7
+      env: WEBPACK_VERSION=3 BABEL_LOADER=7 JEST_VERSION=22
     - node_js: 6
-      env: WEBPACK_VERSION=3 BABEL_LOADER=7
-    - node_js: 6
-      env: WEBPACK_VERSION=2 BABEL_LOADER=7
+      env: WEBPACK_VERSION=3 BABEL_LOADER=7 JEST_VERSION=22
 before_script:
-  - npm install webpack@$WEBPACK_VERSION babel-loader@$BABEL_LOADER
+  - npm install webpack@$WEBPACK_VERSION babel-loader@$BABEL_LOADER jest@$JEST_VERSION
 script:
   - npm run build
   - npm test

@@ -9,7 +9,7 @@ const {configHash, contextHash, depsContextHash, fileHash} =
   require('./file-hash');
 
 const hashMembers = (members, memberHash) => {
-  return Promise.all(members.map(memberHash))
+  return Promise.all(Array.from(members).map(memberHash))
     .then(hashes => hashes.reduce((carry, value) => hash(carry + value), ''));
 };
 
@@ -45,8 +45,8 @@ class ManifestPlugin {
               pify(readFile)(join(compiler.options.context, '.cache/jest-webpack', resource))
               .then(hash)
               .catch(() => ''),
-              hashMembers(manifest[resource].fileDependencies, fileHash),
-              hashMembers(manifest[resource].contextDependencies, contextHash),
+              hashMembers(manifest[resource].fileDependencies || manifest[resource].buildInfo.fileDependencies || [], fileHash),
+              hashMembers(manifest[resource].contextDependencies || manifest[resource].buildInfo.contextDependencies || [], contextHash),
             ])
             .then(([hash, fileHash, contextHash]) => {
               if (
@@ -83,9 +83,8 @@ class ManifestPlugin {
           return cb();
         }
 
-        // console.log(manifest);
-        // process.exit();
         options.data.setManifest(manifest);
+        // options.data.setManifest(null);
         cb();
       })
       .catch(err => {console.error(err); throw err;})
@@ -128,8 +127,8 @@ class ManifestPlugin {
               .concat(...block.blocks.map(listBlkRequests))
             );
             manifest[fileCompilation.compiler.name] = {
-              fileDependencies: fileCompilation.fileDependencies,
-              contextDependencies: fileCompilation.contextDependencies,
+              fileDependencies: Array.from(fileCompilation.fileDependencies),
+              contextDependencies: Array.from(fileCompilation.contextDependencies),
               hash,
               fileHash,
               contextHash,

@@ -82,6 +82,6 @@ module.exports = webpackIf({
   plugins: [
     // A webpack cache plugin. A cache is written to the file system and reused
     // when possible during later runs for faster builds.
-    ifProd(null, () => new HardSourceWebpackPlugin()),
+    // new HardSourceWebpackPlugin(),
   ],
 });

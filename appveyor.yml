@@ -1,8 +1,8 @@
 # Test against the latest version of this Node.js version
 environment:
   matrix:
-    - nodejs_version: "6"
-      webpack_version: "2"
+    - nodejs_version: "10"
+      webpack_version: "4"
       babel_loader_version: "7"
     - nodejs_version: "8"
       webpack_version: "3"
@@ -32,3 +32,7 @@ build_script:
   - npm --version
   # run a build (node 4/webpack 1 will test with the build)
   - npm run build
+
+branches:
+  only:
+    - master
