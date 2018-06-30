@@ -1,5 +1,5 @@
 const fs = require('fs');
-const {dirname, join, relative} = require('path');
+const {dirname, join, relative, sep} = require('path');
 const {fork} = require('child_process');
 
 const findUp = require('find-up');
@@ -17,8 +17,6 @@ const promisify = fn => (...args) => new Promise((resolve, reject) => {
 const readdir = promisify(fs.readdir);
 const rimraf = promisify(_rimraf);
 const stat = promisify(fs.stat);
-
-const sep = '/';
 
 const walkDir = async (root, dir, files = []) => {
   let dirItems;
@@ -264,14 +262,14 @@ const missesOutput = (out) => result => {
 };
 
 const itTests = (files) => result => {
-  files.forEach(file => expect(result.stderr).toMatch(file.replace(/\//g, sep)));
+  files.forEach(file => expect(result.stderr).toMatch(file));
   return result;
 };
 
 const itSkips = (files) => result => {
   files.forEach(file => (
     expect(result.stderr)
-    .not.toMatch(file.replace(/\//g, sep))
+    .not.toMatch(file)
   ));
   return result;
 };
