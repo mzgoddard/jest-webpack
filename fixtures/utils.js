@@ -1,5 +1,5 @@
 const fs = require('fs');
-const {dirname, join, relative, sep} = require('path');
+const {dirname, join, relative} = require('path');
 const {fork} = require('child_process');
 
 const findUp = require('find-up');
@@ -17,6 +17,8 @@ const promisify = fn => (...args) => new Promise((resolve, reject) => {
 const readdir = promisify(fs.readdir);
 const rimraf = promisify(_rimraf);
 const stat = promisify(fs.stat);
+
+const sep = '/';
 
 const walkDir = async (root, dir, files = []) => {
   let dirItems;
