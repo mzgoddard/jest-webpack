@@ -1,5 +1,5 @@
 var join = require('path').join;
-var HardSourceWebpackPlugin = require('hard-source-webpack-plugin');
+// var HardSourceWebpackPlugin = require('hard-source-webpack-plugin');
 var webpackIf = require('webpack-if');
 
 var AssetsBuiltPlugin = require('../assets-built-plugin');
