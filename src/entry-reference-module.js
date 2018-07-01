@@ -9,7 +9,7 @@ const hash = require('./hash');
 
 class EntryReferenceModule extends Module {
   constructor(resource) {
-    super();
+    super('javascript/auto');
     this.context = dirname(resource);
     this.resource = resource;
     this.isEntry = false;
@@ -29,6 +29,14 @@ class EntryReferenceModule extends Module {
 
   build(options, compilation, resolver, fs, callback) {
     this.built = true;
+    this.buildMeta = {providedExports: []};
+    this.buildInfo = {
+      cacheable: false,
+      assets: [],
+      dependencies: this.dependencies,
+      fileDependencies: new Set,
+      contextDependencies: new Set
+    };
     callback();
   }
 
@@ -44,12 +52,12 @@ class EntryReferenceModule extends Module {
       if (dep.request.indexOf('!') === -1 && dep.request.indexOf('?') === -1) {
         if (refKeys.default) {return;}
         refKeys.default = true;
-        references.push(`  default: function() {return __webpack_require__(${dep.module.id});}`);
+        references.push(`  default: function() {return __webpack_require__('${dep.module.id}');}`);
       }
       else {
         if (refKeys[hash(dep.request)]) {return;}
         refKeys[hash(dep.request)] = true;
-        references.push(`  ${JSON.stringify(hash(dep.request))}: function() {return __webpack_require__(${dep.module.id});}`);
+        references.push(`  ${JSON.stringify(hash(dep.request))}: function() {return __webpack_require__('${dep.module.id}');}`);
       }
     });
     let rawSource = `module.exports = {\n${references.join(',\n')}\n};\n`;

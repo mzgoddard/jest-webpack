@@ -56,6 +56,18 @@ function main(argv, config) {
   });
   config.plugins.push(new JestWebpackPlugin({argv, jestArgv, jestConfig}));
 
+  try {
+    // If we can resolve JavascriptGenerator assume config takes a mode option.
+    require.resolve('webpack/lib/JavascriptGenerator');
+    // Set mode to 'development' by default.
+    if (!config.mode) {
+      config.mode = 'development';
+    }
+  }
+  catch (error) {
+    // If we cannot resolve JavascriptGenerator there is no mode option
+  }
+
   var compiler = webpack(config);
 
   // var watchMode = process.argv

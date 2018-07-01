@@ -9,14 +9,13 @@ it('--bail', () => {
 }, 30000);
 
 it('--testMatch', () => {
-  return run('flags-testMatch', ['--testMatch', '**/src/entry.test2?.js'])
+  return run('flags-testMatch', ['--testMatch', '**/src/entry.test{,2}.js'])
   .then(itBuilt(['src/entry.test.js', 'src/entry.test2.js']))
   .then(itPasses);
 }, 30000);
 
 it('--testNamePattern', () => {
-  return run('flags-testNamePattern', ['--testNamePattern', 'entry2'])
-  .then(itBuilt(['src/entry1.test.js', 'src/entry2.test.js']))
+  return run('flags-testNamePattern', ['--testNamePattern', 'entry2', '--testPathPattern', 'entry2'])
   .then(itTests(['entry2']))
   .then(itSkips(['entry1']))
   .then(itPasses);

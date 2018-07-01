@@ -1,6 +1,6 @@
 var {join, resolve} = require('path');
 
-var HardSourceWebpackPlugin = require('hard-source-webpack-plugin');
+// var HardSourceWebpackPlugin = require('hard-source-webpack-plugin');
 var webpack = require('webpack');
 var webpackIf = require('webpack-if');
 
@@ -82,6 +82,6 @@ module.exports = webpackIf({
   plugins: [
     // A webpack cache plugin. A cache is written to the file system and reused
     // when possible during later runs for faster builds.
-    ifProd(null, () => new HardSourceWebpackPlugin()),
+    // new HardSourceWebpackPlugin(),
   ],
 });

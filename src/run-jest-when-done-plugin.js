@@ -2,6 +2,8 @@ const {join} = require('path');
 
 const jest = require('jest');
 
+const tapable = require('tapable');
+
 class RunJestWhenDone {
   constructor(options = {}) {
     this.options = options;
@@ -10,6 +12,10 @@ class RunJestWhenDone {
   apply(compiler) {
     const {argv, jestArgv} = this.options;
     // let cliOnce = false;
+
+    if (compiler.hooks && !compiler.hooks.jestWebpackDone) {
+      compiler.hooks.jestWebpackDone = new tapable.SyncHook(['result']);
+    }
 
     compiler.plugin('done', function() {
       const config = compiler.options;
@@ -23,12 +29,20 @@ class RunJestWhenDone {
       process.chdir(wd);
 
       const jestDone = result => {
-        if (compiler._plugins['jest-webpack-done']) {
+        if (
+          compiler.hooks && compiler.hooks.jestWebpackDone.taps.length ||
+          !compiler.hooks && compiler._plugins['jest-webpack-done']
+        ) {
           try {
             process.chdir(oldWd);
           }
           finally {
-            compiler.applyPlugins('jest-webpack-done', result);
+            if (compiler.hooks) {
+              compiler.hooks.jestWebpackDone.call(result);
+            }
+            else {
+              compiler.applyPlugins('jest-webpack-done', result);
+            }
           }
           return true;
         }
@@ -47,6 +61,8 @@ class RunJestWhenDone {
       };
 
       try {
+        console.log();
+
         run()
         .then((result) => {
           if (!jestDone(result.results)) {

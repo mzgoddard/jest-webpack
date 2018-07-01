@@ -262,14 +262,14 @@ const missesOutput = (out) => result => {
 };
 
 const itTests = (files) => result => {
-  files.forEach(file => expect(result.stderr).toMatch(file.replace(/\//g, sep)));
+  files.forEach(file => expect(result.stderr).toMatch(file));
   return result;
 };
 
 const itSkips = (files) => result => {
   files.forEach(file => (
     expect(result.stderr)
-    .not.toMatch(file.replace(/\//g, sep))
+    .not.toMatch(file)
   ));
   return result;
 };

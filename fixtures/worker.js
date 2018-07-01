@@ -66,10 +66,21 @@ const run = () => {
     webpackConfig.plugins = webpackConfig.plugins || [];
     webpackConfig.plugins.push({
       apply(compiler) {
-        compiler.plugin('jest-webpack-done', ({success}) => {
-          process.send({id: job.id, success});
-          exitTimeout = setTimeout(() => process.exit(), 100);
-        });
+        const tapable = require('tapable');
+        if (compiler.hooks) {
+          compiler.hooks.jestWebpackDone = compiler.hooks.jestWebpackDone ||
+            new tapable.SyncHook(['result']);
+          compiler.hooks.jestWebpackDone.tap('jest-webpack fixtures worker', ({success}) => {
+            process.send({id: job.id, success});
+            exitTimeout = setTimeout(() => process.exit(), 100);
+          });
+        }
+        else {
+          compiler.plugin('jest-webpack-done', ({success}) => {
+            process.send({id: job.id, success});
+            exitTimeout = setTimeout(() => process.exit(), 100);
+          });
+        }
       },
     });
     process.chdir(join(fixtureRootPath, job.fixture));

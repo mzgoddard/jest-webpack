@@ -1,5 +1,5 @@
 const {join} = require('path');
-var HardSourceWebpackPlugin = require('hard-source-webpack-plugin');
+// var HardSourceWebpackPlugin = require('hard-source-webpack-plugin');
 
 var AssetsBuiltPlugin = require('../assets-built-plugin');
 

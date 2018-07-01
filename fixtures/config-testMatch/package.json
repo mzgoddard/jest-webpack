@@ -2,6 +2,6 @@
   "name": "config-testMatch",
   "version": "1.0.0",
   "jest": {
-    "testMatch": ["**/src/*.test2?.js"]
+    "testMatch": ["**/src/*.test{,2}.js"]
   }
 }
