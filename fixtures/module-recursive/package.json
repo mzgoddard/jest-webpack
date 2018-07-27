@@ -1,5 +1,5 @@
 {
-  "name": "module-multiple-loaders",
+  "name": "module-recursive",
   "version": "1.0.0",
   "jest": {
     "testURL": "http://localhost/"

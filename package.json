@@ -67,6 +67,7 @@
     "testPathIgnorePatterns": [
       "/node_modules/",
       "/fixtures/"
-    ]
+    ],
+    "testURL": "http://localhost/"
   }
 }

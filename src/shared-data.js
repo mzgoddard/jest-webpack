@@ -221,8 +221,9 @@ class SharedData {
   }
 
   compileModule(request, resource, callback, isEntry = false) {
+    this.modules[request] = true;
+
     if (
-      // !isEntry &&
       this.manifest &&
       this.manifest[resource] &&
       (
@@ -230,14 +231,7 @@ class SharedData {
         .findIndex(transform => (
           transform.request === request && transform.isEntry === isEntry
         )) !== -1
-        // this.manifest[resource].transforms
-        // .findIndex(transform => transform.rawRequest === '!!' + request) !== -1
       )
-      //  ||
-      // isEntry &&
-      // this.manifest &&
-      // this.manifest[resource] &&
-      // this.manifest[resource].transforms.find(transform => transform.isEntry)
     ) {
       this.fulfilledManifest[resource] = this.fulfilledManifest[resource] || {
         transforms: [],
@@ -248,41 +242,23 @@ class SharedData {
         isEntry,
       });
 
-      // if (isEntry) {
-      //   request = this.manifest[resource].transforms
-      //   .find(transform => transform.isEntry)
-      //   .request;
-      // }
-      // else {
-      //   request = (
-      //     this.manifest[resource].transforms
-      //     .find(transform => transform.request === request)
-      //     // this.manifest[resource].transforms
-      //     // .find(transform => transform.rawRequest === '!!' + request)
-      //   ).request;
-      // }
-      // if (
-      //   this.fulfilledManifest[resource].transforms
-      //   .findIndex(transform => transform.request === request) === -1
-      // ) {
-        // console.log('stand deps',
-        //   this.manifest[resource].transforms
-        //   .findIndex(transform => transform.request === request),
-        //   resource, request);
+      this.manifest[resource].transforms
+      .find(transform => transform.request === request)
+      .dependencies.forEach(dep => {
+        const depSplit = dep.split('!');
+        const resource = depSplit[depSplit.length - 1];
 
-        // this.fulfilledManifest[resource].transforms.push(request);
-        this.manifest[resource].transforms
-        .find(transform => transform.request === request)
-        .dependencies.forEach(dep => {
-          const depSplit = dep.split('!');
-          const resource = depSplit[depSplit.length - 1];
+        // Stop modules from recursively looping at this point.
+        if (!this.modules[dep]) {
           this.compileModule(dep, resource.split('?')[0], () => {}, resource.split('?')[1] === '__jest_webpack_isEntry');
-        });
-      // }
+        }
+      });
+
       return callback(null, {
         request: request,
       });
     }
+
     if (this.manifest && this.manifest[resource]) {
       this.manifest[resource] = null;
 
@@ -295,43 +271,28 @@ class SharedData {
       }
     }
 
-    // console.log('not cached', resource, request);
-
     this.compileFile(resource, () => {
-      if (!this.modules[request]) {
-        this.startModule(request);
+      this.startModule(request);
 
-        const dep = new EntryReferenceTransformDependency(
-          (isEntry ? '' : '!!') + request
-        );
+      const dep = new EntryReferenceTransformDependency(
+        (isEntry ? '' : '!!') + request
+      );
 
-        this.compilations[resource]
-        ._addModuleChain(dirname(resource), dep, module => {
-          dep.module = module;
-          dep.request = module.request;
-          // if (isEntry) {
-          //   dep.request = module.request;
-          // }
-          // else {
-          //   module.request = request;
-          // }
-          // console.log(dep.request, module.request);
-          this.entries[resource].addData(dep);
-          if (isEntry) {
-            this.entries[resource].isEntry = true;
-            this.entries[resource].entryRequest = module.request;
-          }
-        }, (err, module) => {
-          this.completeModule(request, err);
-        });
+      this.compilations[resource]
+      ._addModuleChain(dirname(resource), dep, module => {
+        dep.module = module;
+        dep.request = module.request;
 
-        callback(null, dep);
-      }
-      else {
-        const dep = this.entries[resource].dependencies
-        .find(dep => dep.request === request);
-        callback(null, dep);
-      }
+        this.entries[resource].addData(dep);
+        if (isEntry) {
+          this.entries[resource].isEntry = true;
+          this.entries[resource].entryRequest = module.request;
+        }
+      }, (err, module) => {
+        this.completeModule(request, err);
+      });
+
+      callback(null, dep);
     }, isEntry);
   }
 
