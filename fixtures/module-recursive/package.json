@@ -1,5 +1,5 @@
 {
-  "name": "module-blocks",
+  "name": "module-recursive",
   "version": "1.0.0",
   "jest": {
     "testURL": "http://localhost/"
