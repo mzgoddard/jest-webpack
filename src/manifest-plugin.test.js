@@ -36,6 +36,7 @@ const itCachesChange = (fixture, {built, notBuilt, tests, filesA, filesB}) => {
 itCaches('module-blocks', 'src/entry.test.js');
 itCaches('module-multiple-loaders', 'src/entry.test.js');
 itCaches('module-multiple-loaders-test', 'src/entry.test.js');
+itCaches('module-recursive', 'src/entry.test.js');
 itCaches('module-variables', 'src/entry.test.js');
 itCaches('test-entries-src', 'src/entry.test.js');
 itCaches('test-entries-src-babel', 'src/entry.test.js');
