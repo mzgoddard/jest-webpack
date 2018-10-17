@@ -77,7 +77,7 @@ function run(argv, webpackConfig) {
     process.env.NODE_ENV = 'test';
   }
 
-  main(argv, webpackConfig);
+  main(jestArgvPortion, webpackConfig);
 }
 
 if (process.mainModule === module) {
