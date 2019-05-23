@@ -37,12 +37,16 @@ function run(argv, webpackConfig) {
     var webpackYargs = require('yargs/yargs')([]);
     tryRequire(
       function() {return require('webpack/bin/config-yargs');},
-      function() {return require('webpack-cli/bin/config-yargs');}
+      function() {return require('webpack/bin/config/config-yargs');},
+      function() {return require('webpack-cli/bin/config-yargs');},
+      function() {return require('webpack-cli/bin/config/config-yargs');}
     )(webpackYargs);
     var webpackArgv = webpackYargs.parse(webpackArgvPortion);
     webpackConfig = tryRequire(
       function() {return require('webpack/bin/convert-argv');},
-      function() {return require('webpack-cli/bin/convert-argv');}
+      function() {return require('webpack/bin/config/convert-argv');},
+      function() {return require('webpack-cli/bin/convert-argv');},
+      function() {return require('webpack-cli/bin/config/convert-argv');}
     )(
       webpackYargs, webpackArgv
     );
