@@ -15,13 +15,15 @@ const SearchSource = tryRequire(
   () => require('jest/node_modules/jest-cli/build/search_source'),
   () => require('jest/node_modules/jest-cli/build/SearchSource'),
   () => require('jest-cli/build/search_source'),
-  () => require('jest-cli/build/SearchSource')
+  () => require('jest-cli/build/SearchSource'),
+  () => require('@jest/core/build/SearchSource')
 );
 const createContext = tryRequire(
   () => require('jest/node_modules/jest-cli/build/lib/create_context'),
   () => require('jest/node_modules/jest-cli/build/lib/createContext'),
   () => require('jest-cli/build/lib/create_context'),
-  () => require('jest-cli/build/lib/createContext')
+  () => require('jest-cli/build/lib/createContext'),
+  () => require('@jest/core/build/lib/create_context')
 );
 const Runtime = tryRequire(
   () => require('jest/node_modules/jest-cli/node_modules/jest-runtime'),
