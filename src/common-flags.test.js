@@ -1,4 +1,4 @@
-const {run, itBuilt, didNotBuild, itTests, itSkips, containsOutput, itPasses, itFails} =
+const {run, itBuilt, didNotBuild, itTests, itDoesNotTest, itSkips, containsOutput, itPasses, itFails} =
   require('../fixtures/utils');
 
 it('--bail', () => {
@@ -25,7 +25,7 @@ it('--testPathPattern', () => {
   return run('flags-testPathPattern', ['--testPathPattern', 'entry1.test'])
   .then(didNotBuild(['src/entry2.test.js']))
   .then(itTests(['entry1']))
-  .then(itSkips(['entry2']))
+  .then(itDoesNotTest(['entry2']))
   .then(itPasses);
 }, 30000);
 
