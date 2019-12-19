@@ -16,7 +16,8 @@ const SearchSource = tryRequire(
   () => require('jest/node_modules/jest-cli/build/SearchSource'),
   () => require('jest-cli/build/search_source'),
   () => require('jest-cli/build/SearchSource'),
-  () => require('jest-cli').SearchSource,
+  () => require('jest/node_modules/jest-cli').SearchSource,
+  () => require('jest-cli').SearchSource
 
 );
 const createContext = tryRequire(
