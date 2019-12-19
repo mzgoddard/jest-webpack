@@ -266,18 +266,10 @@ const itTests = (files) => result => {
   return result;
 };
 
-const itDoesNotTest = (files) => result => {
-  files.forEach(file => (
-    expect(result.stderr)
-    .not.toMatch(file)
-  ));
-  return result;
-};
-
 const itSkips = (files) => result => {
   files.forEach(file => (
     expect(result.stderr)
-    .toMatch(`skipped tests ${file}`)
+    .not.toMatch(file)
   ));
   return result;
 };
@@ -295,6 +287,5 @@ module.exports = {
   containsOutput,
   missesOutput,
   itTests,
-  itDoesNotTest,
   itSkips,
 };
