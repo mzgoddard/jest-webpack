@@ -268,8 +268,11 @@ const itTests = (files) => result => {
 
 const itSkips = (files) => result => {
   files.forEach(file => (
-    expect(result.stderr)
-    .not.toMatch(file)
+    expect(
+      result.stderr.indexOf(file) === -1 || // filename is NOT present in stderr
+      result.stderr.indexOf(`skipped tests ${file}`) !== -1 // "skipped test" with filename IS present in stderr
+    )
+    .toBeTruthy()
   ));
   return result;
 };
