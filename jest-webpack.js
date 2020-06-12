@@ -44,6 +44,7 @@ function run(argv, webpackConfig) {
     webpackConfig = tryRequire(
       function() {return require('webpack/bin/convert-argv');},
       function() {return require('webpack-cli/bin/convert-argv');}
+      function() {return require('webpack-cli/bin/utils/convert-argv');}
     )(
       webpackYargs, webpackArgv
     );
